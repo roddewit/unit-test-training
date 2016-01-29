@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Refactoring
 {
-    class Authenticator
+    public class Authenticator
     {
         private readonly List<User> users;
 

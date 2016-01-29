@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Refactoring
 {
-    class Store
+    public class Store
     {
         private readonly User user;
         private readonly DataManager dataManager;
@@ -21,16 +21,19 @@ namespace Refactoring
         {
             if (!UserHasFundsForPurchase(product, quantity))
             {
-                throw new Exception("User does not have sufficient funds to purchase product");
+                throw new InsufficientFundsException();
             }
 
             if (!StoreHasStockForPurchase(product, quantity))
             {
-                throw new Exception("Store does not enough stock to purchase product quantity.")
+                throw new OutOfStockException();
             }
 
             product.Quantity = product.Quantity - quantity;
             user.Balance = user.Balance - product.Price * quantity;
+
+            dataManager.SaveUser(user);
+            dataManager.SaveProduct(product);
         }
 
         public bool UserHasFundsForPurchase(Product product, int quantity)
@@ -57,6 +60,21 @@ namespace Refactoring
             }
 
             Console.WriteLine(dataManager.Products.Count + 1 + ": Exit");
+        }
+
+        public int NumberOfProducts()
+        {
+            return dataManager.Products.Count;
+        }
+
+        public Product GetProductByIndex(int index)
+        {
+            return dataManager.Products[index];
+        }
+
+        private static string GetFormattedProductText(Product product, int productIndex)
+        {
+            return String.Format("{0}: {1} ({2:C})", productIndex, product.Name, product.Price);
         }
     }
 }

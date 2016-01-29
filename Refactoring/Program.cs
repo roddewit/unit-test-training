@@ -17,13 +17,17 @@ namespace Refactoring
             // Load products from data file
             List<Product> products = JsonConvert.DeserializeObject<List<Product>>(File.ReadAllText(@"Data\Products.json"));
 
+            DataManager dataManager = new DataManager(users, products);
             WriteWelcomeToTUSCMessage();
 
-            User loggedInUser = LogIn(users);
-            Store store = new Store(loggedInUser, products);
+            User loggedInUser = LoginManager.LogIn(users);
+            if (loggedInUser != null)
+            {
+                Store store = new Store(loggedInUser, dataManager);
 
-            Tusc tusc = new Tusc(loggedInUser, store);
-            tusc.Run();
+                Tusc tusc = new Tusc(loggedInUser, store);
+                tusc.Run();
+            }
         }
 
         private static void WriteWelcomeToTUSCMessage()
@@ -32,52 +36,5 @@ namespace Refactoring
             Console.WriteLine("Welcome to TUSC");
             Console.WriteLine("---------------");
         }
-
-        private static User LogIn(List<User> users)
-        {
-            User loggedInUser = null;
-            while (loggedInUser == null)
-            {
-                Authenticator authenticator = new Authenticator(users);
-                LoginView loginView = new LoginView(authenticator);
-
-                loggedInUser = loginView.Login();
-
-                WriteLoginMessage(loggedInUser);
-            }
-
-            return loggedInUser;
-        }
-
-        private static void WriteLoginMessage(User user)
-        {
-            if (user != null)
-            {
-                WriteSuccessfulLoginMessage(user);
-            }
-            else
-            {
-                WriteInvalidLoginMessage();
-            }
-        }
-
-        private static void WriteSuccessfulLoginMessage(User user)
-        {
-            Console.Clear();
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine();
-            Console.WriteLine(String.Format("Login successful! Welcome {0}!", user.Name));
-            Console.ResetColor();
-        }
-
-        private static void WriteInvalidLoginMessage()
-        {
-            Console.Clear();
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine();
-            Console.WriteLine("You entered an invalid username or password.");
-            Console.ResetColor();
-        }   
-
     }
 }

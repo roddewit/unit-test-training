@@ -70,11 +70,18 @@ namespace UnitTestProject
                 {
                     Console.SetIn(reader);
 
-                    Tusc.Run(users, products);
+                    DataManager dataManager = new DataManager(users, products);
+
+                    //Tusc.Run(users, products);
+                    User loggedInUser = LoginManager.LogIn(users);
+                    Store store = new Store(loggedInUser, dataManager);
+
+                    Tusc tusc = new Tusc(loggedInUser, store);
+                    tusc.Run();
                 }
             }
         }
-
+        
         [Test]
         public void Test_InvalidUserIsNotAccepted()
         {
@@ -86,10 +93,12 @@ namespace UnitTestProject
                 {
                     Console.SetIn(reader);
 
-                    Tusc.Run(users, products);
+                    DataManager dataManager = new DataManager(users, products);
+
+                    User loggedInUser = LoginManager.LogIn(users);
                 }
 
-                Assert.IsTrue(writer.ToString().Contains("You entered an invalid user"));
+                Assert.IsTrue(writer.ToString().Contains("You entered an invalid username or password."));
             }
         }
 
@@ -104,11 +113,13 @@ namespace UnitTestProject
                 {
                     Console.SetIn(reader);
 
-                    Tusc.Run(users, products);
+                    DataManager dataManager = new DataManager(users, products);
+
+                    User loggedInUser = LoginManager.LogIn(users);
                 }
             }
         }
-
+        
         [Test]
         public void Test_InvalidPasswordIsNotAccepted()
         {
@@ -120,13 +131,15 @@ namespace UnitTestProject
                 {
                     Console.SetIn(reader);
 
-                    Tusc.Run(users, products);
+                    DataManager dataManager = new DataManager(users, products);
+
+                    User loggedInUser = LoginManager.LogIn(users);
                 }
 
-                Assert.IsTrue(writer.ToString().Contains("You entered an invalid password"));
+                Assert.IsTrue(writer.ToString().Contains("You entered an invalid username or password."));
             }
         }
-
+        
         [Test]
         public void Test_UserCanCancelPurchase()
         {
@@ -138,14 +151,20 @@ namespace UnitTestProject
                 {
                     Console.SetIn(reader);
 
-                    Tusc.Run(users, products);
+                    DataManager dataManager = new DataManager(users, products);
+
+                    User loggedInUser = LoginManager.LogIn(users);
+                    Store store = new Store(loggedInUser, dataManager);
+
+                    Tusc tusc = new Tusc(loggedInUser, store);
+                    tusc.Run();
                 }
 
                 Assert.IsTrue(writer.ToString().Contains("Purchase cancelled"));
 
             }
         }
-
+        
         [Test]
         public void Test_ErrorOccursWhenBalanceLessThanPrice()
         {
@@ -161,13 +180,19 @@ namespace UnitTestProject
                 {
                     Console.SetIn(reader);
 
-                    Tusc.Run(tempUsers, products);
+                    DataManager dataManager = new DataManager(tempUsers, products);
+
+                    User loggedInUser = LoginManager.LogIn(tempUsers);
+                    Store store = new Store(loggedInUser, dataManager);
+
+                    Tusc tusc = new Tusc(loggedInUser, store);
+                    tusc.Run();
                 }
 
                 Assert.IsTrue(writer.ToString().Contains("You do not have enough money to buy that"));
             }
         }
-
+        
         [Test]
         public void Test_ErrorOccursWhenProductOutOfStock()
         {
@@ -183,7 +208,13 @@ namespace UnitTestProject
                 {
                     Console.SetIn(reader);
 
-                    Tusc.Run(users, tempProducts);
+                    DataManager dataManager = new DataManager(users, tempProducts);
+
+                    User loggedInUser = LoginManager.LogIn(users);
+                    Store store = new Store(loggedInUser, dataManager);
+
+                    Tusc tusc = new Tusc(loggedInUser, store);
+                    tusc.Run();
                 }
 
                 Assert.IsTrue(writer.ToString().Contains("is out of stock"));

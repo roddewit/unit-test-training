@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Refactoring
 {
-    class LoginView
+    public class LoginView
     {
         private readonly Authenticator authenticator;
 
@@ -18,6 +18,11 @@ namespace Refactoring
         public User Login()
         {
             string username = GetUsername();
+            if (String.IsNullOrEmpty(username))
+            {
+                throw new EmptyUsernameException();
+            }
+
             string password = GetPassword();
 
             return authenticator.Authenticate(username, password);

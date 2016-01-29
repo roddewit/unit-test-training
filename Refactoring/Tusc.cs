@@ -28,75 +28,43 @@ namespace Refactoring
             {
                 store.WriteProductList();
 
-                Product product = SelectProduct(products);
+                int productIndex = ReadProductIndex(store.NumberOfProducts());
 
-                if (product == null)
+                if (productIndex == store.NumberOfProducts() + 1) 
                 {
-                    SaveData();
-                    WaitForConsoleClose();
                     done = true;
                 }
                 else
                 {
+                    Product product = store.GetProductByIndex(productIndex-1);
+                                
                     WriteProductToPurchaseMessage(product);
 
                     int purchaseQuantity = GetPurchaseQuantity(product);
 
-                    bool insufficientFunds = user.Balance - product.Price * purchaseQuantity < 0;
-                    if (insufficientFunds)
+                    try
                     {
-                        WriteNotEnoughMoneyMessage();
-                        continue;
+                        if (purchaseQuantity > 0)
+                        {
+                            store.Purchase(product, purchaseQuantity);
+                        }
+                        else
+                        {
+                            WritePurchaseCancelledMessage();
+                        }
                     }
-
-                    bool insufficientStock = product.Quantity <= purchaseQuantity;
-                    if (insufficientStock)
+                    catch (InsufficientFundsException)
+                    {
+                        WriteInsufficientFundsMessage();
+                    }
+                    catch (OutOfStockException)
                     {
                         WriteOutOfStockMessage(product);
-                        continue;
-                    }
-
-                    // Check if quantity is greater than zero
-                    if (purchaseQuantity > 0)
-                    {
-                        PurchaseProduct(product, purchaseQuantity);
-                    }
-                    else
-                    {
-                        WritePurchaseCancelledMessage();
                     }
                 }
             }
 
             WaitForConsoleClose();
-        }
-
-        private void PurchaseProduct(Product product, int purchaseQuantity)
-        {
-            user.Balance = user.Balance - product.Price * purchaseQuantity;
-            product.Quantity = product.Quantity - purchaseQuantity;
-
-            WriteSuccessfulPurchaseMessage(product, purchaseQuantity);
-        }
-
-        private void SaveData()
-        {
-            SaveUsers();
-            SaveProducts();
-        }
-
-        private void SaveUsers()
-        {
-            // Write out new balance
-            string json = JsonConvert.SerializeObject(users, Formatting.Indented);
-            File.WriteAllText(@"Data\Users.json", json);
-        }
-
-        private void SaveProducts()
-        {
-            // Write out new quantities
-            string json = JsonConvert.SerializeObject(products, Formatting.Indented);
-            File.WriteAllText(@"Data\Products.json", json);
         }
 
         private static void WritePurchaseCancelledMessage()
@@ -127,7 +95,7 @@ namespace Refactoring
             Console.ResetColor();
         }
 
-        private static void WriteNotEnoughMoneyMessage()
+        private static void WriteInsufficientFundsMessage()
         {
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Red;
@@ -138,20 +106,15 @@ namespace Refactoring
 
         private static int GetPurchaseQuantity(Product product)
         {
-            while (true)
+            int purchaseQuantity;
+            bool validIntegerEntered = Int32.TryParse(ReadText("Enter amount to purchase: "), out purchaseQuantity);
+
+            while (!validIntegerEntered)
             {
-                try
-                {
-                    Console.WriteLine("Enter amount to purchase:");
-                    string answer = Console.ReadLine();
-                    return Convert.ToInt32(answer);
-                }
-                catch
-                {
-                    Console.WriteLine("You have entered an invalid purchase quantity.");
-                }
+                Console.WriteLine("You have entered an invalid purchase quantity.");
             }
-            
+
+            return purchaseQuantity;            
         }
 
         private void WriteProductToPurchaseMessage(Product product)
@@ -169,33 +132,23 @@ namespace Refactoring
             Console.ReadLine();
         }
 
-        private static Product SelectProduct(List<Product> products) 
+        private static string ReadText(string message)
         {
-            while (true)
+            Console.WriteLine(message);
+            return Console.ReadLine();
+        }
+
+        private static int ReadProductIndex(int numProducts) 
+        {
+            int productIndex;
+            bool validIntegerEntered = Int32.TryParse(ReadText("Enter a number: "), out productIndex);
+
+            while (!validIntegerEntered || !IsValidProductSelected(numProducts, productIndex)) 
             {
-                try
-                {
-                    Console.WriteLine("Enter a number:");
-                    string enteredText = Console.ReadLine();
-                    int enteredProductIndex = Convert.ToInt32(enteredText);
-
-                    if (IsExitProductSelected(products, enteredProductIndex))
-                    {
-                        return null;
-                    }
-
-                    if (!IsValidProductSelected(products, enteredProductIndex))
-                    {
-                        throw new Exception("Invalid product number entered.");
-                    }
-
-                    return  products[enteredProductIndex];
-                }
-                catch
-                {
-                    Console.WriteLine("Invalid number entered, please enter a valid number.");
-                }
+                Console.WriteLine("Invalid number entered, pleas enter a valid number");
             }
+
+            return productIndex;
         }
 
         private static bool IsExitProductSelected(List<Product> products, int enteredProductIndex)
@@ -203,9 +156,9 @@ namespace Refactoring
             return enteredProductIndex == products.Count + 1;
         }
 
-        private static bool IsValidProductSelected(List<Product> products, int enteredProductIndex)
+        private static bool IsValidProductSelected(int numProducts, int enteredProductIndex)
         {
-            return enteredProductIndex > 0 || enteredProductIndex <= products.Count;
+            return enteredProductIndex > 0 || enteredProductIndex <= numProducts;
         }
 
         private static void WriteCurrentBalanceMessage(User loggedInUser)
