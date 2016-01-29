@@ -48,7 +48,7 @@ namespace Refactoring
         {
             // Write out new balance
             string json = JsonConvert.SerializeObject(users, Formatting.Indented);
-            File.WriteAllText(@"Data\Users.json", json);
+            File.WriteAllText("Data/Users.json", json);
         }
 
         public void SaveProduct(Product product)
@@ -70,7 +70,7 @@ namespace Refactoring
         {
             // Write out new quantities
             string json = JsonConvert.SerializeObject(products, Formatting.Indented);
-            File.WriteAllText(@"Data\Products.json", json);
+            File.WriteAllText("Data/Products.json", json);
         }
     }
 }
