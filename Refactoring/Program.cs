@@ -32,7 +32,6 @@ namespace Refactoring
 
         private static void WriteWelcomeToTUSCMessage()
         {
-            // Write welcome message
             Console.WriteLine("Welcome to TUSC");
             Console.WriteLine("---------------");
         }
