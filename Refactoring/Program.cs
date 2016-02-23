@@ -11,6 +11,8 @@ namespace Refactoring
     {
         public static void Main(string[] args)
         {
+            IConsole console = new ConsoleImpl();
+
             // Load users from data file
             List<User> users = JsonConvert.DeserializeObject<List<User>>(File.ReadAllText(@"Data/Users.json"));
 
@@ -18,22 +20,23 @@ namespace Refactoring
             List<Product> products = JsonConvert.DeserializeObject<List<Product>>(File.ReadAllText(@"Data/Products.json"));
 
             DataManager dataManager = new DataManager(users, products);
-            WriteWelcomeToTUSCMessage();
+            WriteWelcomeToTUSCMessage(console);
 
-            User loggedInUser = LoginManager.LogIn(users);
+            LoginManager loginManager = new LoginManager(console);
+            User loggedInUser = loginManager.LogIn(users);
             if (loggedInUser != null)
             {
-                Store store = new Store(loggedInUser, dataManager);
+                Store store = new Store(console, loggedInUser, dataManager);
 
-                Tusc tusc = new Tusc(loggedInUser, store);
+                Tusc tusc = new Tusc(console, loggedInUser, store);
                 tusc.Run();
             }
         }
 
-        private static void WriteWelcomeToTUSCMessage()
+        private static void WriteWelcomeToTUSCMessage(IConsole console)
         {
-            Console.WriteLine("Welcome to TUSC");
-            Console.WriteLine("---------------");
+            console.WriteLine("Welcome to TUSC");
+            console.WriteLine("---------------");
         }
     }
 }

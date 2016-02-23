@@ -10,11 +10,13 @@ namespace Refactoring
     {
         private readonly User user;
         private readonly DataManager dataManager;
+        private readonly IConsole console;
         
-        public Store(User user, DataManager dataManager)
+        public Store(IConsole console, User user, DataManager dataManager)
         {
             this.user = user;
             this.dataManager = dataManager;
+            this.console = console;
         }
 
         public void Purchase(Product product, int quantity)
@@ -50,16 +52,16 @@ namespace Refactoring
         public void WriteProductList()
         {
             // Prompt for user input
-            Console.WriteLine();
-            Console.WriteLine("What would you like to buy?");
+            console.WriteLine();
+            console.WriteLine("What would you like to buy?");
 
             foreach (var item in dataManager.Products.Select((product, index) => new { index, product }))
             {
                 string productDisplay = GetFormattedProductText(item.product, item.index + 1);
-                Console.WriteLine(productDisplay);
+                console.WriteLine(productDisplay);
             }
 
-            Console.WriteLine(dataManager.Products.Count + 1 + ": Exit");
+            console.WriteLine(dataManager.Products.Count + 1 + ": Exit");
         }
 
         public int NumberOfProducts()

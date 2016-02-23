@@ -9,9 +9,11 @@ namespace Refactoring
     public class LoginView
     {
         private readonly Authenticator authenticator;
+        private readonly IConsole console;
 
-        public LoginView(Authenticator authenticator)
+        public LoginView(IConsole console, Authenticator authenticator)
         {
+            this.console = console;
             this.authenticator = authenticator;
         }
 
@@ -30,15 +32,15 @@ namespace Refactoring
 
         private string GetUsername()
         {
-            Console.WriteLine();
-            Console.WriteLine("Enter Username:");
-            return Console.ReadLine();
+            console.WriteLine();
+            console.WriteLine("Enter Username:");
+            return console.ReadLine();
         }
 
         private string GetPassword()
         {
-            Console.WriteLine("Enter Password:");
-            return Console.ReadLine();
+            console.WriteLine("Enter Password:");
+            return console.ReadLine();
         }
     }
 }
