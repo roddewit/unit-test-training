@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Refactoring
 {
+    [Serializable]
     class EmptyUsernameException : Exception
     {
     }
