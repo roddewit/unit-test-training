@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
-using Moq;
 
 namespace UnitTestProject
 {
@@ -47,13 +46,6 @@ namespace UnitTestProject
         [Test]
         public void Test_StartingTuscFromMainDoesNotThrowAnException()
         {
-            var idx = 0;
-            string[] returnValues = { "Jason", "sfa", "1", "1", "8", String.Empty };
-
-            var mockConsole = new Mock<IConsole>();
-            mockConsole.Setup(c => c.ReadLine())
-                .Returns(() => returnValues[idx++]);
-
             using (var writer = new StringWriter())
             {
                 Console.SetOut(writer);
@@ -70,39 +62,44 @@ namespace UnitTestProject
         [Test]
         public void Test_TuscDoesNotThrowAnException()
         {
-            var idx = 0;
-            string[] returnValues = { "Jason", "sfa", "1", "1", "8", String.Empty };
+            using (var writer = new StringWriter())
+            {
+                Console.SetOut(writer);
 
-            var mockConsole = new Mock<IConsole>();
-            mockConsole.Setup(c => c.ReadLine())
-                .Returns(() => returnValues[idx++]);
+                using (var reader = new StringReader("Jason\r\nsfa\r\n1\r\n1\r\n8\r\n\r\n"))
+                {
+                    Console.SetIn(reader);
 
-            DataManager dataManager = new DataManager(users, products);
+                    DataManager dataManager = new DataManager(users, products);
 
-            LoginManager loginManager = new LoginManager(mockConsole.Object);
-            User loggedInUser = loginManager.LogIn(users);
-            Store store = new Store(mockConsole.Object, loggedInUser, dataManager);
+                    //Tusc.Run(users, products);
+                    User loggedInUser = LoginManager.LogIn(users);
+                    Store store = new Store(loggedInUser, dataManager);
 
-            Tusc tusc = new Tusc(mockConsole.Object, loggedInUser, store);
-            tusc.Run();
+                    Tusc tusc = new Tusc(loggedInUser, store);
+                    tusc.Run();
+                }
+            }
         }
         
         [Test]
         public void Test_InvalidUserIsNotAccepted()
         {
-            var idx = 0;
-            string[] returnValues = { "invalid_user", "invalid_pass", "Jason", "sfa" };
+            using (var writer = new StringWriter())
+            {
+                Console.SetOut(writer);
 
-            var mockConsole = new Mock<IConsole>();
-            mockConsole.Setup(c => c.ReadLine())
-                .Returns(() => returnValues[idx++]);
+                using (var reader = new StringReader("Joel\r\n"))
+                {
+                    Console.SetIn(reader);
 
-            DataManager dataManager = new DataManager(users, products);
+                    DataManager dataManager = new DataManager(users, products);
 
-            LoginManager loginManager = new LoginManager(mockConsole.Object);
-            User loggedInUser = loginManager.LogIn(users);
+                    User loggedInUser = LoginManager.LogIn(users);
+                }
 
-            mockConsole.Verify(c => c.WriteLine("You entered an invalid username or password."));
+                Assert.IsTrue(writer.ToString().Contains("You entered an invalid username or password."));
+            }
         }
 
         [Test]
@@ -118,8 +115,7 @@ namespace UnitTestProject
 
                     DataManager dataManager = new DataManager(users, products);
 
-                    LoginManager loginManager = new LoginManager(new ConsoleImpl());
-                    User loggedInUser = loginManager.LogIn(users);
+                    User loggedInUser = LoginManager.LogIn(users);
                 }
             }
         }
@@ -137,70 +133,92 @@ namespace UnitTestProject
 
                     DataManager dataManager = new DataManager(users, products);
 
-                    LoginManager loginManager = new LoginManager(new ConsoleImpl());
-                    User loggedInUser = loginManager.LogIn(users);
+                    User loggedInUser = LoginManager.LogIn(users);
                 }
 
                 Assert.IsTrue(writer.ToString().Contains("You entered an invalid username or password."));
             }
         }
-
+        
         [Test]
         public void Test_UserCanCancelPurchase()
         {
-            var idx = 0;
-            string[] returnValues = { "Jason", "sfa", "1", "0", "8", String.Empty };
+            using (var writer = new StringWriter())
+            {
+                Console.SetOut(writer);
 
-            var mockConsole = new Mock<IConsole>();
-            mockConsole.Setup(c => c.ReadLine())
-                .Returns(() => returnValues[idx++]);
+                using (var reader = new StringReader("Jason\r\nsfa\r\n1\r\n0\r\n8\r\n\r\n"))
+                {
+                    Console.SetIn(reader);
 
-            DataManager dataManager = new DataManager(users, products);
+                    DataManager dataManager = new DataManager(users, products);
 
-            LoginManager loginManager = new LoginManager(mockConsole.Object);
-            User loggedInUser = loginManager.LogIn(users);
-            Store store = new Store(mockConsole.Object, loggedInUser, dataManager);
+                    User loggedInUser = LoginManager.LogIn(users);
+                    Store store = new Store(loggedInUser, dataManager);
 
-            Tusc tusc = new Tusc(mockConsole.Object, loggedInUser, store);
-            tusc.Run();
+                    Tusc tusc = new Tusc(loggedInUser, store);
+                    tusc.Run();
+                }
 
-            mockConsole.Verify(c => c.WriteLine("Purchase cancelled"));
+                Assert.IsTrue(writer.ToString().Contains("Purchase cancelled"));
+
+            }
         }
-
+        
         [Test]
         public void Test_ErrorOccursWhenBalanceLessThanPrice()
         {
-            var idx = 0;
-            string[] returnValues = { "Jason", "sfa", "1", "1", "8", String.Empty };
-
-            var mockConsole = new Mock<IConsole>();
-            mockConsole.Setup(c => c.ReadLine())
-                .Returns(() => returnValues[idx++]);
-
             // Update data file
             List<User> tempUsers = DeepCopy<List<User>>(originalUsers);
             tempUsers.Where(u => u.Name == "Jason").Single().Balance = 0.0;
 
-            DataManager dataManager = new DataManager(tempUsers, products);
+            using (var writer = new StringWriter())
+            {
+                Console.SetOut(writer);
 
-            LoginManager loginManager = new LoginManager(mockConsole.Object);
-            User loggedInUser = loginManager.LogIn(tempUsers);
-            Store store = new Store(mockConsole.Object, loggedInUser, dataManager);
+                using (var reader = new StringReader("Jason\r\nsfa\r\n1\r\n1\r\n8\r\n\r\n"))
+                {
+                    Console.SetIn(reader);
 
-            Tusc tusc = new Tusc(mockConsole.Object, loggedInUser, store);
-            tusc.Run();
+                    DataManager dataManager = new DataManager(tempUsers, products);
 
-            mockConsole.Verify(c => c.WriteLine("You do not have enough money to buy that."));
+                    User loggedInUser = LoginManager.LogIn(tempUsers);
+                    Store store = new Store(loggedInUser, dataManager);
+
+                    Tusc tusc = new Tusc(loggedInUser, store);
+                    tusc.Run();
+                }
+
+                Assert.IsTrue(writer.ToString().Contains("You do not have enough money to buy that"));
+            }
         }
-
+        
         [Test]
         public void Test_ErrorOccursWhenProductOutOfStock()
         {
-            var mockConsole = new Mock<IConsole>();
+            // Update data file
+            List<Product> tempProducts = DeepCopy<List<Product>>(originalProducts);
+            tempProducts.Where(u => u.Name == "Chips").Single().Quantity = 0;
 
-            // TODO: Complete test to work
+            using (var writer = new StringWriter())
+            {
+                Console.SetOut(writer);
 
-            mockConsole.Verify(c => c.WriteLine("Sorry, Chips is out of stock"));
+                using (var reader = new StringReader("Jason\r\nsfa\r\n1\r\n1\r\n8\r\n\r\n"))
+                {
+                    Console.SetIn(reader);
+
+                    DataManager dataManager = new DataManager(users, tempProducts);
+
+                    User loggedInUser = LoginManager.LogIn(users);
+                    Store store = new Store(loggedInUser, dataManager);
+
+                    Tusc tusc = new Tusc(loggedInUser, store);
+                    tusc.Run();
+                }
+
+                Assert.IsTrue(writer.ToString().Contains("is out of stock"));
+            }
         }
 
         private static T DeepCopy<T>(T obj)

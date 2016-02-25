@@ -12,11 +12,9 @@ namespace Refactoring
     {
         private readonly User user;
         private readonly Store store;
-        private readonly IConsole console;
 
-        public Tusc(IConsole console, User user, Store store)
+        public Tusc(User user, Store store)
         {
-            this.console = console;
             this.user = user;
             this.store = store;
         }
@@ -69,51 +67,51 @@ namespace Refactoring
             WaitForConsoleClose();
         }
 
-        private void WritePurchaseCancelledMessage()
+        private static void WritePurchaseCancelledMessage()
         {
             // Quantity is less than zero
-            console.Clear();
-            console.ForegroundColor = ConsoleColor.Yellow;
-            console.WriteLine();
-            console.WriteLine("Purchase cancelled");
-            console.ResetColor();
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine();
+            Console.WriteLine("Purchase cancelled");
+            Console.ResetColor();
         }
 
         private void WriteSuccessfulPurchaseMessage(Product product, int purchaseQuantity)
         {
-            console.Clear();
-            console.ForegroundColor = ConsoleColor.Green;
-            console.WriteLine("You bought " + purchaseQuantity + " " + product.Name);
-            console.WriteLine("Your new balance is " + user.Balance.ToString("C"));
-            console.ResetColor();
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("You bought " + purchaseQuantity + " " + product.Name);
+            Console.WriteLine("Your new balance is " + user.Balance.ToString("C"));
+            Console.ResetColor();
         }
 
-        private void WriteOutOfStockMessage(Product product)
+        private static void WriteOutOfStockMessage(Product product)
         {
-            console.Clear();
-            console.ForegroundColor = ConsoleColor.Red;
-            console.WriteLine();
-            console.WriteLine("Sorry, " + product.Name + " is out of stock");
-            console.ResetColor();
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine();
+            Console.WriteLine("Sorry, " + product.Name + " is out of stock");
+            Console.ResetColor();
         }
 
-        private void WriteInsufficientFundsMessage()
+        private static void WriteInsufficientFundsMessage()
         {
-            console.Clear();
-            console.ForegroundColor = ConsoleColor.Red;
-            console.WriteLine();
-            console.WriteLine("You do not have enough money to buy that.");
-            console.ResetColor();
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine();
+            Console.WriteLine("You do not have enough money to buy that.");
+            Console.ResetColor();
         }
 
-        private int GetPurchaseQuantity(Product product)
+        private static int GetPurchaseQuantity(Product product)
         {
             int purchaseQuantity;
             bool validIntegerEntered = Int32.TryParse(ReadText("Enter amount to purchase: "), out purchaseQuantity);
 
             while (!validIntegerEntered)
             {
-                console.WriteLine("You have entered an invalid purchase quantity.");
+                Console.WriteLine("You have entered an invalid purchase quantity.");
             }
 
             return purchaseQuantity;            
@@ -121,53 +119,53 @@ namespace Refactoring
 
         private void WriteProductToPurchaseMessage(Product product)
         {
-            console.WriteLine();
-            console.WriteLine("You want to buy: " + product.Name);
-            console.WriteLine("Your balance is " + user.Balance.ToString("C"));
+            Console.WriteLine();
+            Console.WriteLine("You want to buy: " + product.Name);
+            Console.WriteLine("Your balance is " + user.Balance.ToString("C"));
         }
 
-        private void WaitForConsoleClose()
+        private static void WaitForConsoleClose()
         {
             // Prevent console from closing
-            console.WriteLine();
-            console.WriteLine("Press Enter key to exit");
-            console.ReadLine();
+            Console.WriteLine();
+            Console.WriteLine("Press Enter key to exit");
+            Console.ReadLine();
         }
 
-        private string ReadText(string message)
+        private static string ReadText(string message)
         {
-            console.WriteLine(message);
-            return console.ReadLine();
+            Console.WriteLine(message);
+            return Console.ReadLine();
         }
 
-        private int ReadProductIndex(int numProducts) 
+        private static int ReadProductIndex(int numProducts) 
         {
             int productIndex;
             bool validIntegerEntered = Int32.TryParse(ReadText("Enter a number: "), out productIndex);
 
             while (!validIntegerEntered || !IsValidProductSelected(numProducts, productIndex)) 
             {
-                console.WriteLine("Invalid number entered, pleas enter a valid number");
+                Console.WriteLine("Invalid number entered, pleas enter a valid number");
             }
 
             return productIndex;
         }
 
-        private bool IsExitProductSelected(List<Product> products, int enteredProductIndex)
+        private static bool IsExitProductSelected(List<Product> products, int enteredProductIndex)
         {
             return enteredProductIndex == products.Count + 1;
         }
 
-        private bool IsValidProductSelected(int numProducts, int enteredProductIndex)
+        private static bool IsValidProductSelected(int numProducts, int enteredProductIndex)
         {
             return enteredProductIndex > 0 || enteredProductIndex <= numProducts;
         }
 
-        private void WriteCurrentBalanceMessage(User loggedInUser)
+        private static void WriteCurrentBalanceMessage(User loggedInUser)
         {
             // Show balance 
-            console.WriteLine();
-            console.WriteLine("Your balance is " + loggedInUser.Balance.ToString("C"));
+            Console.WriteLine();
+            Console.WriteLine("Your balance is " + loggedInUser.Balance.ToString("C"));
         }
     }
 }
