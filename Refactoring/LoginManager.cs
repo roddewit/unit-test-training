@@ -8,14 +8,7 @@ namespace Refactoring
 {
     public class LoginManager
     {
-        private readonly IConsole console;
-
-        public LoginManager(IConsole console)
-        {
-            this.console = console;
-        }
-
-        public User LogIn(List<User> users)
+        public static User LogIn(List<User> users)
         {
             try
             {
@@ -23,7 +16,7 @@ namespace Refactoring
                 while (loggedInUser == null)
                 {
                     Authenticator authenticator = new Authenticator(users);
-                    LoginView loginView = new LoginView(console, authenticator);
+                    LoginView loginView = new LoginView(authenticator);
 
                     loggedInUser = loginView.Login();
 
@@ -37,15 +30,15 @@ namespace Refactoring
                 WriteInvalidLoginMessage();
                 
                 // Exit gracefully
-                console.WriteLine();
-                console.WriteLine("Press Enter key to exit");
-                console.ReadLine();
+                Console.WriteLine();
+                Console.WriteLine("Press Enter key to exit");
+                Console.ReadLine();
 
                 return null;
             }
         }
 
-        private void WriteLoginMessage(User user)
+        private static void WriteLoginMessage(User user)
         {
             if (user != null)
             {
@@ -57,22 +50,22 @@ namespace Refactoring
             }
         }
 
-        private void WriteSuccessfulLoginMessage(User user)
+        private static void WriteSuccessfulLoginMessage(User user)
         {
-            console.Clear();
-            console.ForegroundColor = ConsoleColor.Green;
-            console.WriteLine();
-            console.WriteLine(String.Format("Login successful! Welcome {0}!", user.Name));
-            console.ResetColor();
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine();
+            Console.WriteLine(String.Format("Login successful! Welcome {0}!", user.Name));
+            Console.ResetColor();
         }
 
-        private void WriteInvalidLoginMessage()
+        private static void WriteInvalidLoginMessage()
         {
-            console.Clear();
-            console.ForegroundColor = ConsoleColor.Red;
-            console.WriteLine();
-            console.WriteLine("You entered an invalid username or password.");
-            console.ResetColor();
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine();
+            Console.WriteLine("You entered an invalid username or password.");
+            Console.ResetColor();
         }
     }
 }
