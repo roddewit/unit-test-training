@@ -221,6 +221,30 @@ namespace UnitTestProject
             }
         }
 
+        [Test]
+        public void Test_ProductListContainsExitItem()
+        {
+            using (var writer = new StringWriter())
+            {
+                Console.SetOut(writer);
+
+                using (var reader = new StringReader("Jason\r\nsfa\r\n1\r\n1\r\n8\r\n\r\n"))
+                {
+                    Console.SetIn(reader);
+
+                    DataManager dataManager = new DataManager(users, products);
+
+                    User loggedInUser = LoginManager.LogIn(users);
+                    Store store = new Store(loggedInUser, dataManager);
+
+                    Tusc tusc = new Tusc(loggedInUser, store);
+                    tusc.Run();
+                }
+
+                Assert.IsTrue(writer.ToString().Contains("8: Exit"));
+            }
+        }
+
         private static T DeepCopy<T>(T obj)
         {
             using (MemoryStream stream = new MemoryStream())
