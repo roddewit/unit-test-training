@@ -245,6 +245,31 @@ namespace UnitTestProject
             }
         }
 
+        //[Test]
+        //public void Test_UserCanExitByEnteringQuit()
+        //{
+        //    using (var writer = new StringWriter())
+        //    {
+        //        Console.SetOut(writer);
+
+        //        using (var reader = new StringReader("Jason\r\nsfa\r\nquit\r\n\r\n"))
+        //        {
+        //            Console.SetIn(reader);
+
+        //            DataManager dataManager = new DataManager(users, products);
+
+        //            User loggedInUser = LoginManager.LogIn(users);
+        //            Store store = new Store(loggedInUser, dataManager);
+
+        //            Tusc tusc = new Tusc(loggedInUser, store);
+        //            tusc.Run();
+        //        }
+
+        //        Assert.IsTrue(writer.ToString().Contains("Type quit to exit the application"));
+        //        Assert.IsTrue(writer.ToString().Contains("Press Enter key to exit"));
+        //    }
+        //}
+
         private static T DeepCopy<T>(T obj)
         {
             using (MemoryStream stream = new MemoryStream())

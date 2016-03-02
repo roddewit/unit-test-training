@@ -145,7 +145,7 @@ namespace Refactoring
 
             while (!validIntegerEntered || !IsValidProductSelected(numProducts, productIndex)) 
             {
-                Console.WriteLine("Invalid number entered, pleas enter a valid number");
+                Console.WriteLine("Invalid number entered, please enter a valid number");
             }
 
             return productIndex;
