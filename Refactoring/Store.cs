@@ -55,11 +55,14 @@ namespace Refactoring
 
             foreach (var item in dataManager.Products.Select((product, index) => new { index, product }))
             {
-                string productDisplay = GetFormattedProductText(item.product, item.index + 1);
-                Console.WriteLine(productDisplay);
+                if(item.product.Quantity > 0)
+                {
+                    string productDisplay = GetFormattedProductText(item.product);
+                    Console.WriteLine(productDisplay);
+                }
             }
 
-            Console.WriteLine(dataManager.Products.Count + 1 + ": Exit");
+            Console.WriteLine("Type quit to exit the application");
         }
 
         public int NumberOfProducts()
@@ -67,14 +70,19 @@ namespace Refactoring
             return dataManager.Products.Count;
         }
 
-        public Product GetProductByIndex(int index)
+        public Product GetProductById(string productId)
         {
-            return dataManager.Products[index];
+            return dataManager.Products.FirstOrDefault(p => p.Id.Equals(productId));
         }
 
-        private static string GetFormattedProductText(Product product, int productIndex)
+        public bool ContainsProduct(string productId)
         {
-            return String.Format("{0}: {1} ({2:C})", productIndex, product.Name, product.Price);
+            return dataManager.Products.Count(p => p.Id.Equals(productId)) > 0;
+        }
+
+        private static string GetFormattedProductText(Product product)
+        {
+            return String.Format("{0}: {1} ({2:C})", product.Id, product.Name, product.Price);
         }
     }
 }

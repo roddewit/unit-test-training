@@ -28,15 +28,15 @@ namespace Refactoring
             {
                 store.WriteProductList();
 
-                int productIndex = ReadProductIndex(store.NumberOfProducts());
+                string productId = ReadProductId();
 
-                if (productIndex == store.NumberOfProducts() + 1) 
+                if (productId.Equals("quit"))
                 {
                     done = true;
                 }
-                else
+                else if (!productId.Equals(""))
                 {
-                    Product product = store.GetProductByIndex(productIndex-1);
+                    Product product = store.GetProductById(productId);
                                 
                     WriteProductToPurchaseMessage(product);
 
@@ -47,6 +47,7 @@ namespace Refactoring
                         if (purchaseQuantity > 0)
                         {
                             store.Purchase(product, purchaseQuantity);
+                            WriteSuccessfulPurchaseMessage(product, purchaseQuantity);
                         }
                         else
                         {
@@ -138,28 +139,20 @@ namespace Refactoring
             return Console.ReadLine();
         }
 
-        private static int ReadProductIndex(int numProducts) 
+        private string ReadProductId() 
         {
-            int productIndex;
-            bool validIntegerEntered = Int32.TryParse(ReadText("Enter a number: "), out productIndex);
-
-            while (!validIntegerEntered || !IsValidProductSelected(numProducts, productIndex)) 
+            string productId = ReadText("Enter a product ID: ");
+            if (!productId.Equals("quit"))
             {
-                Console.WriteLine("Invalid number entered, please enter a valid number");
+                if (!store.ContainsProduct(productId))
+                {
+                    Console.WriteLine("Invalid product ID entered, please enter a valid ID");
+                    productId = "";
+                }
             }
-
-            return productIndex;
+            return productId;
         }
-
-        private static bool IsExitProductSelected(List<Product> products, int enteredProductIndex)
-        {
-            return enteredProductIndex == products.Count + 1;
-        }
-
-        private static bool IsValidProductSelected(int numProducts, int enteredProductIndex)
-        {
-            return enteredProductIndex > 0 || enteredProductIndex <= numProducts;
-        }
+        
 
         private static void WriteCurrentBalanceMessage(User loggedInUser)
         {

@@ -50,7 +50,7 @@ namespace UnitTestProject
             {
                 Console.SetOut(writer);
 
-                using (var reader = new StringReader("Jason\r\nsfa\r\n1\r\n1\r\n8\r\n\r\n"))
+                using (var reader = new StringReader("Jason\r\nsfa\r\n1\r\n1\r\nquit\r\n\r\n"))
                 {
                     Console.SetIn(reader);
 
@@ -66,7 +66,7 @@ namespace UnitTestProject
             {
                 Console.SetOut(writer);
 
-                using (var reader = new StringReader("Jason\r\nsfa\r\n1\r\n1\r\n8\r\n\r\n"))
+                using (var reader = new StringReader("Jason\r\nsfa\r\n1\r\n1\r\nquit\r\n\r\n"))
                 {
                     Console.SetIn(reader);
 
@@ -147,7 +147,7 @@ namespace UnitTestProject
             {
                 Console.SetOut(writer);
 
-                using (var reader = new StringReader("Jason\r\nsfa\r\n1\r\n0\r\n8\r\n\r\n"))
+                using (var reader = new StringReader("Jason\r\nsfa\r\n1\r\n0\r\nquit\r\n\r\n"))
                 {
                     Console.SetIn(reader);
 
@@ -176,7 +176,7 @@ namespace UnitTestProject
             {
                 Console.SetOut(writer);
 
-                using (var reader = new StringReader("Jason\r\nsfa\r\n1\r\n1\r\n8\r\n\r\n"))
+                using (var reader = new StringReader("Jason\r\nsfa\r\n1\r\n1\r\nquit\r\n\r\n"))
                 {
                     Console.SetIn(reader);
 
@@ -204,7 +204,7 @@ namespace UnitTestProject
             {
                 Console.SetOut(writer);
 
-                using (var reader = new StringReader("Jason\r\nsfa\r\n1\r\n1\r\n8\r\n\r\n"))
+                using (var reader = new StringReader("Jason\r\nsfa\r\n1\r\n1\r\nquit\r\n\r\n"))
                 {
                     Console.SetIn(reader);
 
@@ -228,7 +228,7 @@ namespace UnitTestProject
             {
                 Console.SetOut(writer);
 
-                using (var reader = new StringReader("Jason\r\nsfa\r\n1\r\n1\r\n8\r\n\r\n"))
+                using (var reader = new StringReader("Jason\r\nsfa\r\n1\r\n1\r\nquit\r\n\r\n"))
                 {
                     Console.SetIn(reader);
 
@@ -241,34 +241,90 @@ namespace UnitTestProject
                     tusc.Run();
                 }
 
-                Assert.IsTrue(writer.ToString().Contains("8: Exit"));
+                Assert.IsTrue(writer.ToString().Contains("Type quit to exit the application"));
             }
         }
 
-        //[Test]
-        //public void Test_UserCanExitByEnteringQuit()
-        //{
-        //    using (var writer = new StringWriter())
-        //    {
-        //        Console.SetOut(writer);
+        [Test]
+        public void Test_UserCanPurchaseProductWhenOnlyOneInStock()
+        {
+            // Update data file
+            List<Product> tempProducts = DeepCopy<List<Product>>(originalProducts);
+            tempProducts.Where(u => u.Name == "Chips").Single().Quantity = 1;
 
-        //        using (var reader = new StringReader("Jason\r\nsfa\r\nquit\r\n\r\n"))
-        //        {
-        //            Console.SetIn(reader);
+            using (var writer = new StringWriter())
+            {
+                Console.SetOut(writer);
 
-        //            DataManager dataManager = new DataManager(users, products);
+                using (var reader = new StringReader("Jason\r\nsfa\r\n1\r\n1\r\nquit\r\n\r\n"))
+                {
+                    Console.SetIn(reader);
 
-        //            User loggedInUser = LoginManager.LogIn(users);
-        //            Store store = new Store(loggedInUser, dataManager);
+                    DataManager dataManager = new DataManager(users, products);
 
-        //            Tusc tusc = new Tusc(loggedInUser, store);
-        //            tusc.Run();
-        //        }
+                    User loggedInUser = LoginManager.LogIn(users);
+                    Store store = new Store(loggedInUser, dataManager);
 
-        //        Assert.IsTrue(writer.ToString().Contains("Type quit to exit the application"));
-        //        Assert.IsTrue(writer.ToString().Contains("Press Enter key to exit"));
-        //    }
-        //}
+                    Tusc tusc = new Tusc(loggedInUser, store);
+                    tusc.Run();
+                }
+
+                Assert.IsTrue(writer.ToString().Contains("You bought 1 Chips"));
+            }
+        }
+
+        [Test]
+        public void Test_UserCanExitByEnteringQuit()
+        {
+            using (var writer = new StringWriter())
+            {
+                Console.SetOut(writer);
+
+                using (var reader = new StringReader("Jason\r\nsfa\r\nquit\r\n\r\n"))
+                {
+                    Console.SetIn(reader);
+
+                    DataManager dataManager = new DataManager(users, products);
+
+                    User loggedInUser = LoginManager.LogIn(users);
+                    Store store = new Store(loggedInUser, dataManager);
+
+                    Tusc tusc = new Tusc(loggedInUser, store);
+                    tusc.Run();
+                }
+
+                Assert.IsTrue(writer.ToString().Contains("Type quit to exit the application"));
+                Assert.IsTrue(writer.ToString().Contains("Press Enter key to exit"));
+            }
+        }
+
+        [Test]
+        public void Test_ProductsWithZeroQuantityDoNotAppearInMenu()
+        {
+            // Update data file
+            List<Product> tempProducts = DeepCopy<List<Product>>(originalProducts);
+            tempProducts.Where(u => u.Name == "Chips").Single().Quantity = 0;
+            
+            using (var writer = new StringWriter())
+            {
+                Console.SetOut(writer);
+
+                using (var reader = new StringReader("Jason\r\nsfa\r\nquit\r\n\r\n"))
+                {
+                    Console.SetIn(reader);
+
+                    DataManager dataManager = new DataManager(users, tempProducts);
+
+                    User loggedInUser = LoginManager.LogIn(users);
+                    Store store = new Store(loggedInUser, dataManager);
+
+                    Tusc tusc = new Tusc(loggedInUser, store);
+                    tusc.Run();
+                }
+
+                Assert.IsFalse(writer.ToString().Contains(": Chips"));
+            }
+        }
 
         private static T DeepCopy<T>(T obj)
         {
