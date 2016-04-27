@@ -29,7 +29,6 @@ namespace Refactoring
             {
                 WriteInvalidLoginMessage();
                 
-                // Exit gracefully
                 Console.WriteLine();
                 Console.WriteLine("Press Enter key to exit");
                 Console.ReadLine();

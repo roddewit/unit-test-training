@@ -15,7 +15,7 @@ namespace Refactoring
             this.users = users;
         }
 
-        internal User Authenticate(string username, string password)
+        public User Authenticate(string username, string password)
         {
             return FindUserByCredentials(username, password);
         }
@@ -24,7 +24,7 @@ namespace Refactoring
         {
             if (IsValidUsername(username)) 
             {
-                return users.FirstOrDefault(user => user.Name.Equals(username) && user.Password.Equals(password));
+                return users.FirstOrDefault(user => user.Name.Equals(username) && (password == null || user.Password.Equals(password)));
             }
             else
             {

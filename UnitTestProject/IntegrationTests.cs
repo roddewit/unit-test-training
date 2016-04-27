@@ -10,7 +10,8 @@ using System.Runtime.Serialization.Formatters.Binary;
 namespace UnitTestProject
 {
     [TestFixture]
-    public class UnitTests
+    //[Ignore("Disable integration tests")]
+    public class IntegrationTests
     {
         private List<User> users;
         private List<User> originalUsers;

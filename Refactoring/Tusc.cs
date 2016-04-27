@@ -26,7 +26,7 @@ namespace Refactoring
             bool done = false;
             while (!done)
             {
-                store.WriteProductList();
+                Console.Write(store.GetProductList());
 
                 string productId = ReadProductId();
 
@@ -46,7 +46,7 @@ namespace Refactoring
                     {
                         if (purchaseQuantity > 0)
                         {
-                            store.Purchase(product, purchaseQuantity);
+                            store.Purchase(productId, purchaseQuantity);
                             WriteSuccessfulPurchaseMessage(product, purchaseQuantity);
                         }
                         else
@@ -142,13 +142,10 @@ namespace Refactoring
         private string ReadProductId() 
         {
             string productId = ReadText("Enter a product ID: ");
-            if (!productId.Equals("quit"))
+            if (!productId.Equals("quit") && !store.ContainsProduct(productId))
             {
-                if (!store.ContainsProduct(productId))
-                {
-                    Console.WriteLine("Invalid product ID entered, please enter a valid ID");
-                    productId = "";
-                }
+                Console.WriteLine("Invalid product ID entered, please enter a valid ID");
+                productId = "";
             }
             return productId;
         }
