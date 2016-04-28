@@ -70,9 +70,12 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="StoreTests.cs" />
+    <Compile Include="AuthenticatorTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="IntegrationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StoreTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Refactoring\Tusc.csproj">

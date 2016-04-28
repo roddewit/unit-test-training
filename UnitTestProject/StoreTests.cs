@@ -60,34 +60,86 @@ namespace UnitTestProject
         public void Test_PurchaseRemovesProductFromStore()
         {
             //Arrange
+            const string TEST_PRODUCT_ID = "1";
 
+            var users = new List<User>();
+            users.Add(createTestUser("Test User", "", 99.99));
+
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, 10));
+
+            var dataManager = new DataManager(users, products);
+            var store = new Store(users[0], dataManager);
             //Act
+            store.Purchase(TEST_PRODUCT_ID, 9);
 
             //Assert 
-            //(choose the appropriate statement(s))
-            //Assert.AreEqual(1, products[0].Quantity);
-            //Assert.AreSame(1, products[0].Quantity);
-            //Assert.IsTrue(products[0].Quantity == 1);
+            Assert.AreEqual(1, products[0].Quantity);
         }
 
         [Test]
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLow()
         {
             //Arrange
+            const string TEST_PRODUCT_ID = "1";
 
+            var users = new List<User>();
+            users.Add(createTestUser("Test User", "", 3.99));
+
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, 10));
+
+            var dataManager = new DataManager(users, products);
+            var store = new Store(users[0], dataManager);
             //Act
-
-            //Assert
+            try
+            {
+                store.Purchase(TEST_PRODUCT_ID, 1);
+                Assert.Fail("User did not have sufficient funds");
+            }
+            catch (Refactoring.InsufficientFundsException) { }
+            catch(Exception)
+            {
+                Assert.Fail("Wrong exception thrown");
+            }
         }
 
+        [ExpectedException(typeof(Refactoring.InsufficientFundsException))]
         [Test]
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLowVersion2()
         {
             //Arrange
+            const string TEST_PRODUCT_ID = "1";
 
+            var users = new List<User>();
+            users.Add(createTestUser("Test User", "", 3.99));
+
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, 10));
+
+            var dataManager = new DataManager(users, products);
+            var store = new Store(users[0], dataManager);
             //Act
+            store.Purchase(TEST_PRODUCT_ID, 1);
+        }
 
-            //Assert
+        [ExpectedException(typeof(Refactoring.OutOfStockException))]
+        [Test]
+        public void Test_PurchaseThrowsExceptionWhenOutOfStock()
+        {
+            //Arrange
+            const string TEST_PRODUCT_ID = "1";
+
+            var users = new List<User>();
+            users.Add(createTestUser("Test User", "", 99.99));
+
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, 5));
+
+            var dataManager = new DataManager(users, products);
+            var store = new Store(users[0], dataManager);
+            //Act
+            store.Purchase(TEST_PRODUCT_ID, 6);
         }
 
 
