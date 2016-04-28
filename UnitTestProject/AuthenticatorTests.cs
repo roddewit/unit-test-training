@@ -74,22 +74,6 @@ namespace UnitTestProject
             Assert.AreEqual(null, loggedInUser);
         }
 
-        [Test]
-        public void Test_ValidateNullPassword()
-        {
-            User loggedInUser = null;
-            string userName = "Test User1";
-            string userPassword = "123456";
-
-            var users = new List<User>();
-            users.Add(createTestUser(userName, userPassword, 99.99));
-
-            var authenticator = new Authenticator(users);
-
-            loggedInUser = authenticator.Authenticate(userName, null);
-
-            Assert.AreEqual(null, loggedInUser.Name);
-        }
 
         [Test]
         public void Test_ValidateNullUserName()
