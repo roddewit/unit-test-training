@@ -13,6 +13,8 @@ namespace UnitTestProject
     [TestFixture]
     class StoreTests
     {
+        const string TEST_PRODUCT_ID = "1";
+
         private User createTestUser(string name, string password, double balance)
         {
             User testUser = new User();
@@ -34,38 +36,61 @@ namespace UnitTestProject
             return testProduct;
         }
 
+        private static Store SetupStore(List<User> users, List<Product> products)
+        {
+            var dataManager = new DataManager(users, products);
+            var store = new Store(users[0], dataManager);
+            return store;
+        }
+
+        private List<Product> SetupProduct(double productPrice, int productQuantity)
+        {
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", productPrice, productQuantity));
+            return products;
+        }
+
+        private List<User> SetupUser(double userBalance)
+        {
+            var users = new List<User>();
+            users.Add(createTestUser("Test User", "", userBalance));
+            return users;
+        }
+
+
         [Test]
         public void Test_PurchaseThrowsNoErrorForValidFunds()
         {
             //Arrange
-            const string TEST_PRODUCT_ID = "1";
+            var users = SetupUser(99.99);
 
-            var users = new List<User>();
-            users.Add(createTestUser("Test User", "", 99.99));
+            var products = SetupProduct(9.99, 10);
 
-            var products = new List<Product>();
-            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, 10));
-
-            var dataManager = new DataManager(users, products);
-            var store = new Store(users[0], dataManager);
+            var store = SetupStore(users, products);
 
             //Act
             store.Purchase(TEST_PRODUCT_ID, 10);
 
             //Assert
-            Assert.Pass("No assertion really necessary here");
+            Assert.Pass("No exception thrown.");
         }
-
+        
         [Test]
         public void Test_PurchaseRemovesProductFromStore()
         {
             //Arrange
+            var users = SetupUser(99.99);
+
+            var products = SetupProduct(9.99, 10);
+
+            var store = SetupStore(users, products);            
 
             //Act
+            store.Purchase(TEST_PRODUCT_ID, 9);
 
             //Assert 
             //(choose the appropriate statement(s))
-            //Assert.AreEqual(1, products[0].Quantity);
+            Assert.AreEqual(1, products[0].Quantity);
             //Assert.AreSame(1, products[0].Quantity);
             //Assert.IsTrue(products[0].Quantity == 1);
         }
@@ -74,20 +99,66 @@ namespace UnitTestProject
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLow()
         {
             //Arrange
+            var users = SetupUser(1.00);
 
-            //Act
+            var products = SetupProduct(1.01, 10);
 
-            //Assert
+            var store = SetupStore(users, products);
+
+            //Act / Assert
+            try
+            {
+                store.Purchase(TEST_PRODUCT_ID, 1);
+                Assert.Fail("Program did not throw the expected inssufficient funds exception");
+            }
+            catch (InsufficientFundsException e)
+            {
+                Assert.Pass("Expected Exception thrown.");
+            }            
         }
 
         [Test]
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLowVersion2()
         {
             //Arrange
+            var users = SetupUser(2.00);
 
-            //Act
+            var products = SetupProduct(1.01, 10);
 
-            //Assert
+            var store = SetupStore(users, products);
+
+            //Act / Assert
+            try
+            {
+                store.Purchase(TEST_PRODUCT_ID, 2);
+                Assert.Fail("Program did not throw the expected inssufficient funds exception");
+            }
+            catch (InsufficientFundsException e)
+            {
+                Assert.Pass("Expected Exception thrown.");
+            }
+        }
+
+        [Test]
+        public void Test_QuestFor100PercentCoverage()
+        {
+            //Arrange
+            var users = SetupUser(95.00);
+
+            var products = SetupProduct(1.01, 1);
+
+            var store = SetupStore(users, products);
+
+            //Act / Assert
+            try
+            {
+                store.Purchase(TEST_PRODUCT_ID, 2);
+                Assert.Fail("Program did not throw the expected inssufficient funds exception");
+            }
+            catch (OutOfStockException e)
+            {
+                Assert.Pass("Expected Exception thrown.");
+            }
         }
 
 
