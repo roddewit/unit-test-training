@@ -1,12 +1,8 @@
 ﻿using Newtonsoft.Json;
 using NUnit.Framework;
 using Refactoring;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UnitTestProject
 {
@@ -34,20 +30,25 @@ namespace UnitTestProject
             return testProduct;
         }
 
+        private Store createTestStore(List<User> users, List<Product> products)
+        {
+            var dataManager = new DataManager(users, products);
+            var store = new Store(users[0], dataManager);
+
+            return store;
+        }
+
         [Test]
         public void Test_PurchaseThrowsNoErrorForValidFunds()
         {
             //Arrange
-            const string TEST_PRODUCT_ID = "1";
-
             var users = new List<User>();
             users.Add(createTestUser("Test User", "", 99.99));
 
             var products = new List<Product>();
             products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, 10));
 
-            var dataManager = new DataManager(users, products);
-            var store = new Store(users[0], dataManager);
+            var store = createTestStore(users, products);
 
             //Act
             store.Purchase(TEST_PRODUCT_ID, 10);
@@ -60,12 +61,20 @@ namespace UnitTestProject
         public void Test_PurchaseRemovesProductFromStore()
         {
             //Arrange
+            var users = new List<User>();
+            users.Add(createTestUser("Test User", "", 99.99));
+
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, 10));
+
+            var store = createTestStore(users, products);
 
             //Act
+            store.Purchase(TEST_PRODUCT_ID, 9);
 
             //Assert 
             //(choose the appropriate statement(s))
-            //Assert.AreEqual(1, products[0].Quantity);
+            Assert.AreEqual(1, products[0].Quantity);
             //Assert.AreSame(1, products[0].Quantity);
             //Assert.IsTrue(products[0].Quantity == 1);
         }
@@ -74,20 +83,52 @@ namespace UnitTestProject
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLow()
         {
             //Arrange
+            var users = new List<User>();
+            users.Add(createTestUser("Test User", "", 1.00));
 
-            //Act
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 1.01, 10));
 
-            //Assert
+            var store = createTestStore(users, products);
+
+            //Act + Assert
+            Assert.Throws<InsufficientFundsException>(() => store.Purchase(TEST_PRODUCT_ID, 1));
         }
 
         [Test]
+        [ExpectedException(typeof(InsufficientFundsException))]
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLowVersion2()
         {
             //Arrange
+            var users = new List<User>();
+            users.Add(createTestUser("Test User", "", 1.00));
+
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 1.01, 10));
+
+            var store = createTestStore(users, products);
 
             //Act
+            store.Purchase(TEST_PRODUCT_ID, 1);
 
             //Assert
+            Assert.Fail("Testing for InsufficientFundsException.");
+        }
+
+        [Test]
+        public void Test_PurchaseThrowsExceptionStockIsTooLow()
+        {
+            //Arrange
+            var users = new List<User>();
+            users.Add(createTestUser("Test User", "", 99.99));
+
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, 1));
+
+            var store = createTestStore(users, products);
+
+            //Act + Assert
+            Assert.Throws<OutOfStockException>(() => store.Purchase(TEST_PRODUCT_ID, 2));
         }
 
 
@@ -96,6 +137,7 @@ namespace UnitTestProject
         //  actually be broken ... training on how to do this will be coming.
         private List<User> originalUsers;
         private List<Product> originalProducts;
+        private const string TEST_PRODUCT_ID = "1";
 
         [SetUp]
         public void Test_Initialize()
