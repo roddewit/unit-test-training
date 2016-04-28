@@ -13,6 +13,7 @@ namespace UnitTestProject
     [TestFixture]
     class StoreTests
     {
+        const string TEST_PRODUCT_ID = "1";
         private User createTestUser(string name, string password, double balance)
         {
             User testUser = new User();
@@ -34,21 +35,24 @@ namespace UnitTestProject
             return testProduct;
         }
 
+        private DataManager PreArrange(string userName, string userPassword, double userBalance, string productName, double productPrice, int productQty )
+        {
+            var users = new List<User>();
+            users.Add(createTestUser(userName, userPassword, userBalance));
+
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, productName, productPrice, productQty));
+            var dataManager = new DataManager(users, products);
+            return dataManager;
+        }
+
+
         [Test]
         public void Test_PurchaseThrowsNoErrorForValidFunds()
         {
             //Arrange
-            const string TEST_PRODUCT_ID = "1";
-
-            var users = new List<User>();
-            users.Add(createTestUser("Test User", "", 99.99));
-
-            var products = new List<Product>();
-            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, 10));
-
-            var dataManager = new DataManager(users, products);
-            var store = new Store(users[0], dataManager);
-
+            var dataManager = PreArrange("Test User", "", 99.99, "Product", 9.99, 10);
+            var store = new Store(dataManager.Users[0], dataManager);
             //Act
             store.Purchase(TEST_PRODUCT_ID, 10);
 
@@ -60,12 +64,13 @@ namespace UnitTestProject
         public void Test_PurchaseRemovesProductFromStore()
         {
             //Arrange
-
+            var dataManager = PreArrange("Test User", "", 99.99, "Product", 9.99, 10);
+            var store = new Store(dataManager.Users[0], dataManager);
             //Act
-
+            store.Purchase(TEST_PRODUCT_ID, 9);
             //Assert 
             //(choose the appropriate statement(s))
-            //Assert.AreEqual(1, products[0].Quantity);
+            Assert.AreEqual(1, store.GetProductById(TEST_PRODUCT_ID).Quantity);
             //Assert.AreSame(1, products[0].Quantity);
             //Assert.IsTrue(products[0].Quantity == 1);
         }
@@ -74,9 +79,17 @@ namespace UnitTestProject
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLow()
         {
             //Arrange
-
+            var dataManager = PreArrange("Test User", "", 1.00, "Product", 1.01, 10);
+            var store = new Store(dataManager.Users[0], dataManager);
             //Act
-
+            try
+            {
+                store.Purchase(TEST_PRODUCT_ID, 1);
+            }
+            catch(Exception e)
+            {
+                Assert.AreEqual("Exception of type 'Refactoring.InsufficientFundsException' was thrown.", e.Message);
+            }
             //Assert
         }
 
@@ -84,12 +97,36 @@ namespace UnitTestProject
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLowVersion2()
         {
             //Arrange
-
+            var dataManager = PreArrange("Test User", "", 1.00, "Product", 1.01, 10);
+            var store = new Store(dataManager.Users[0], dataManager);
             //Act
-
+            double dBal = dataManager.Users[0].Balance - store.GetProductById(TEST_PRODUCT_ID).Price;
             //Assert
+            Assert.IsFalse(dBal > 0);
         }
+        [Test]
+        public void Test_StoreHasStockForPurchase()
+        {
+            //Arrange
+            var dataManager = PreArrange("Test User", "", 10.00, "Product", 0.55, 10);
+            var store = new Store(dataManager.Users[0], dataManager);
+            //Act
+            try
+            {
+                store.Purchase(TEST_PRODUCT_ID, 12);
+            }
+            catch (Exception e)
+            {
+                if (e.GetType().Name == typeof(OutOfStockException).Name)
+                    Assert.IsFalse((store.GetProductById(TEST_PRODUCT_ID).Quantity - 12) > 0);
+                if ( e.GetType().Name ==typeof(InsufficientFundsException).Name)
+                    Assert.IsFalse(dataManager.Users[0].Balance - store.GetProductById(TEST_PRODUCT_ID).Price * 12 > 0);
 
+            }
+            //Assert
+            
+
+        }
 
         // THE BELOW CODE IS REQUIRED TO PREVENT THE TESTS FROM MODIFYING THE USERS/PRODUCTS ON FILE
         //  This is not a good unit testing pattern - the unit test dependency on the file system should
