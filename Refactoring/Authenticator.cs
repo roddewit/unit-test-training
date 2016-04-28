@@ -12,7 +12,14 @@ namespace Refactoring
 
         public Authenticator(List<User> users)
         {
-            this.users = users;
+            if (users != null)
+            {
+                this.users = users;
+            }
+            else
+            {
+                this.users = new List<User>();
+            }
         }
 
         public User Authenticate(string username, string password)
@@ -24,7 +31,7 @@ namespace Refactoring
         {
             if (IsValidUsername(username)) 
             {
-                return users.FirstOrDefault(user => user.Name.Equals(username) && (password == null || user.Password.Equals(password)));
+                return users.FirstOrDefault(user => user.Name.Equals(username) && user.Password.Equals(password));
             }
             else
             {
