@@ -32,7 +32,7 @@ namespace Refactoring
                 throw new OutOfStockException();
             }
 
-            product.Quantity = product.Quantity - quantity+1;
+            product.Quantity = product.Quantity - quantity;
             user.Balance = user.Balance - product.Price * quantity;
 
             dataManager.SaveUser(user);
