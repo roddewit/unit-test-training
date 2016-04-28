@@ -23,6 +23,11 @@ namespace UnitTestProject
             return testUser;
         }
 
+        private List<User> createSingleTestUserList(string name, string password, double balance)
+        {
+            return new List<User>() { createTestUser(name, password, balance) };
+        }
+
         private Product createTestProduct(string id, string name, double price, int quantity)
         {
             Product testProduct = new Product();
@@ -34,20 +39,27 @@ namespace UnitTestProject
             return testProduct;
         }
 
+        private List<Product> createSingleTestProductList(string id, string name, double price, int quantity)
+        {
+            return new List<Product>() { createTestProduct(id, name, price, quantity) };
+        }
+
+        private Store CreateStore(List<User> users, List<Product> products)
+        {
+            var dataManager = new DataManager(users, products);
+            return new Store(users[0], dataManager);
+        }
+
         [Test]
         public void Test_PurchaseThrowsNoErrorForValidFunds()
         {
             //Arrange
             const string TEST_PRODUCT_ID = "1";
 
-            var users = new List<User>();
-            users.Add(createTestUser("Test User", "", 99.99));
+            var users = createSingleTestUserList("Test User", "", 99.99);
+            var products = createSingleTestProductList(TEST_PRODUCT_ID, "Product", 9.99, 10);
 
-            var products = new List<Product>();
-            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, 10));
-
-            var dataManager = new DataManager(users, products);
-            var store = new Store(users[0], dataManager);
+            var store = CreateStore(users, products);
 
             //Act
             store.Purchase(TEST_PRODUCT_ID, 10);
@@ -62,14 +74,10 @@ namespace UnitTestProject
             //Arrange
             const string TEST_PRODUCT_ID = "1";
 
-            var users = new List<User>();
-            users.Add(createTestUser("Test User", "", 99.99));
+            var users = createSingleTestUserList("Test User", "", 99.99);
+            var products = createSingleTestProductList(TEST_PRODUCT_ID, "Product", 9.99, 10);
 
-            var products = new List<Product>();
-            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, 10));
-
-            var dataManager = new DataManager(users, products);
-            var store = new Store(users[0], dataManager);
+            var store = CreateStore(users, products);
 
             //Act
             store.Purchase(TEST_PRODUCT_ID, 9);
@@ -84,14 +92,10 @@ namespace UnitTestProject
             //Arrange
             const string TEST_PRODUCT_ID = "1";
 
-            var users = new List<User>();
-            users.Add(createTestUser("Test User", "", 1.0));
+            var users = createSingleTestUserList("Test User", "", 1.0);
+            var products = createSingleTestProductList(TEST_PRODUCT_ID, "Product", 1.01, 1);
 
-            var products = new List<Product>();
-            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 1.01, 1));
-
-            var dataManager = new DataManager(users, products);
-            var store = new Store(users[0], dataManager);
+            var store = CreateStore(users, products);
 
             //Act/Assert
             Assert.Throws<InsufficientFundsException>(
@@ -108,14 +112,10 @@ namespace UnitTestProject
             //Arrange
             const string TEST_PRODUCT_ID = "1";
 
-            var users = new List<User>();
-            users.Add(createTestUser("Test User", "", 1.0));
+            var users = createSingleTestUserList("Test User", "", 1.0);
+            var products = createSingleTestProductList(TEST_PRODUCT_ID, "Product", 1.01, 1);
 
-            var products = new List<Product>();
-            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 1.01, 1));
-
-            var dataManager = new DataManager(users, products);
-            var store = new Store(users[0], dataManager);
+            var store = CreateStore(users, products);
 
             //Act
             store.Purchase(TEST_PRODUCT_ID, 1);
@@ -128,14 +128,10 @@ namespace UnitTestProject
             const string TEST_PRODUCT_ID = "1";
             const int STOCK_QUANTITY = 1;
 
-            var users = new List<User>();
-            users.Add(createTestUser("Test User", "", 9001.0));
+            var users = createSingleTestUserList("Test User", "", 9001.0);
+            var products = createSingleTestProductList(TEST_PRODUCT_ID, "Product", 42.0, STOCK_QUANTITY);
 
-            var products = new List<Product>();
-            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 42.0, STOCK_QUANTITY));
-
-            var dataManager = new DataManager(users, products);
-            var store = new Store(users[0], dataManager);
+            var store = CreateStore(users, products);
 
             //Act/Assert
             Assert.Throws<OutOfStockException>(
