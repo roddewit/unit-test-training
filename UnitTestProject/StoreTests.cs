@@ -40,14 +40,9 @@ namespace UnitTestProject
             //Arrange
             const string TEST_PRODUCT_ID = "1";
 
-            var users = new List<User>();
-            users.Add(createTestUser("Test User", "", 99.99));
-
-            var products = new List<Product>();
-            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, 10));
-
-            var dataManager = new DataManager(users, products);
-            var store = new Store(users[0], dataManager);
+            List<Product> products;
+            Store store;
+            ArrangeStoreForProductTest(TEST_PRODUCT_ID, out products, out store);
 
             //Act
             store.Purchase(TEST_PRODUCT_ID, 10);
@@ -59,35 +54,114 @@ namespace UnitTestProject
         [Test]
         public void Test_PurchaseRemovesProductFromStore()
         {
-            //Arrange
+         //Arrange
+            const string TEST_PRODUCT_ID = "1";
+
+            List<Product> products;
+            Store store;
+            ArrangeStoreForProductTest(TEST_PRODUCT_ID, out products, out store);
 
             //Act
-
+            store.Purchase(TEST_PRODUCT_ID, 9);
+       
             //Assert 
             //(choose the appropriate statement(s))
-            //Assert.AreEqual(1, products[0].Quantity);
+            Assert.AreEqual(1, products[0].Quantity);
             //Assert.AreSame(1, products[0].Quantity);
-            //Assert.IsTrue(products[0].Quantity == 1);
+            Assert.IsTrue(products[0].Quantity == 1);
+        }
+
+        private void ArrangeStoreForProductTest(string TEST_PRODUCT_ID, out List<Product> products, out Store store)
+        {
+            var users = new List<User>();
+            users.Add(createTestUser("Test User", "", 99.99));
+
+            products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, 10));
+
+            var dataManager = new DataManager(users, products);
+            store = new Store(users[0], dataManager);
         }
 
         [Test]
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLow()
-        {
+        {         
+           
             //Arrange
+            const string TEST_PRODUCT_ID = "1";
 
+            var store = ArrangeStoreForBalanceTest(TEST_PRODUCT_ID);
+
+
+            try
+            {     
             //Act
+            store.Purchase(TEST_PRODUCT_ID, 1);
+            Assert.Fail();
+            }
+            catch (Exception e)
+            {
+                Assert.AreEqual("Exception of type 'Refactoring.InsufficientFundsException' was thrown.", e.Message);
+            }
 
-            //Assert
         }
+
+        private Store ArrangeStoreForBalanceTest(string TEST_PRODUCT_ID)
+        {
+            double userBalance = 1.00;
+            double productPrice = 1.01;
+            int amountofProducts = 1;
+
+            var store = setupStore(TEST_PRODUCT_ID, userBalance, productPrice, amountofProducts);
+            return store;
+        }
+
+        private Store setupStore(string TEST_PRODUCT_ID, double userBalance, double productPrice, int amountofProducts)
+        {
+            var users = new List<User>();
+            users.Add(createTestUser("Test User", "", userBalance));
+
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", productPrice, amountofProducts));
+
+            var dataManager = new DataManager(users, products);
+            var store = new Store(users[0], dataManager);
+            return store;
+        }
+
 
         [Test]
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLowVersion2()
         {
             //Arrange
+            const string TEST_PRODUCT_ID = "1";
+
+            var store = ArrangeStoreForBalanceTest(TEST_PRODUCT_ID);
+            
+            //Act
+            Assert.Throws<InsufficientFundsException>(() => store.Purchase(TEST_PRODUCT_ID, 1));
+           
+        }
+
+
+        [Test]
+        public void Test_CoveragePurchase()
+        {
+            //Arrange
+            const string TEST_PRODUCT_ID = "1";
+
+            List<Product> products;
+            Store store;
+            ArrangeStoreForProductTest(TEST_PRODUCT_ID, out products, out store);
 
             //Act
+            store.Purchase(TEST_PRODUCT_ID, 9);
 
-            //Assert
+            //Assert 
+            //(choose the appropriate statement(s))
+            Assert.AreEqual(1, store.NumberOfProducts());
+            //Assert.AreSame(1, products[0].Quantity);
+            Assert.IsTrue(store.NumberOfProducts() == 1);
         }
 
 
