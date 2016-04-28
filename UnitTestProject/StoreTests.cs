@@ -60,34 +60,92 @@ namespace UnitTestProject
         public void Test_PurchaseRemovesProductFromStore()
         {
             //Arrange
+            const string TEST_PRODUCT_ID = "1";
+
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, 10));
+
+            var users = new List<User>();
+            users.Add(createTestUser("Test User", "", 100));
+
+            var dataManager = new DataManager(originalUsers, products);
+            var store = new Store(users[0], dataManager);
 
             //Act
+            store.Purchase(TEST_PRODUCT_ID, 9);
 
             //Assert 
             //(choose the appropriate statement(s))
-            //Assert.AreEqual(1, products[0].Quantity);
-            //Assert.AreSame(1, products[0].Quantity);
-            //Assert.IsTrue(products[0].Quantity == 1);
+            Assert.AreEqual(1, products[0].Quantity);
         }
 
         [Test]
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLow()
         {
-            //Arrange
+            const string TEST_PRODUCT_ID = "1";
 
-            //Act
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 1.01, 10));
 
-            //Assert
+            var users = new List<User>();
+            users.Add(createTestUser("Test User", "", 1.00));
+
+            var dataManager = new DataManager(originalUsers, products);
+            var store = new Store(users[0], dataManager);
+
+            try
+            {
+                store.Purchase(TEST_PRODUCT_ID, 1);
+                Assert.Fail();
+            }
+            catch (Exception ex)
+            {
+                Assert.IsTrue(ex is InsufficientFundsException);
+            }
+
         }
 
         [Test]
+        [ExpectedException(typeof(InsufficientFundsException))]
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLowVersion2()
         {
-            //Arrange
+            const string TEST_PRODUCT_ID = "1";
 
-            //Act
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 1.01, 10));
 
-            //Assert
+            var users = new List<User>();
+            users.Add(createTestUser("Test User", "", 1.00));
+
+            var dataManager = new DataManager(originalUsers, products);
+            var store = new Store(users[0], dataManager);
+
+            store.Purchase(TEST_PRODUCT_ID, 1);
+        }
+
+        [Test]
+        public void Test_PurchaseMoreProductsThanStock()
+        {
+            const string TEST_PRODUCT_ID = "1";
+
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 1.00, 10));
+
+            var users = new List<User>();
+            users.Add(createTestUser("Test User", "", 100));
+
+            var dataManager = new DataManager(originalUsers, products);
+            var store = new Store(users[0], dataManager);
+
+            try
+            {
+                store.Purchase(TEST_PRODUCT_ID, 11);
+                Assert.Fail();
+            }
+            catch (Exception e)
+            {
+                Assert.IsTrue(e is OutOfStockException);
+            }
         }
 
 
