@@ -123,6 +123,28 @@ namespace UnitTestProject
             //Assert
         }
 
+		[Test]
+		[ExpectedException(typeof(OutOfStockException))]
+		public void Test_PurchaseThrowsExceptionWhenOutOfStock()
+		{
+			//Arrange
+			const string TEST_PRODUCT_ID = "1";
+
+			var users = new List<User>();
+			users.Add(createTestUser("Test User", "", 5.00));
+
+			var products = new List<Product>();
+			products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 1.00, 1));
+
+			var dataManager = new DataManager(users, products);
+			var store = new Store(users[0], dataManager);
+
+			//Act
+			store.Purchase(TEST_PRODUCT_ID, 2);
+
+			//Assert
+		}
+
 
         // THE BELOW CODE IS REQUIRED TO PREVENT THE TESTS FROM MODIFYING THE USERS/PRODUCTS ON FILE
         //  This is not a good unit testing pattern - the unit test dependency on the file system should
