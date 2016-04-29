@@ -13,41 +13,52 @@ namespace UnitTestProject
     [TestFixture]
     class StoreTests
     {
-        private User createTestUser(string name, string password, double balance)
+        private const string TEST_PRODUCT_ID = "1";
+        private List<User> users;
+        private List<Product> products;
+
+        private void addTestUser(double balance)
         {
             User testUser = new User();
-            testUser.Name = name;
-            testUser.Password = password;
+            testUser.Name = "Test User";
+            testUser.Password = "";
             testUser.Balance = balance;
 
-            return testUser;
+            users.Add(testUser);
         }
 
-        private Product createTestProduct(string id, string name, double price, int quantity)
+        private void addTestProduct(double price, int quantity)
         {
             Product testProduct = new Product();
-            testProduct.Id = id;
-            testProduct.Name = name;
+            testProduct.Id = TEST_PRODUCT_ID;
+            testProduct.Name = "Product";
             testProduct.Price = price;
             testProduct.Quantity = quantity;
 
-            return testProduct;
+            products.Add(testProduct);
+        }
+
+        private Store buildStore()
+        {
+            var dataManager = new DataManager(users, products);
+            return new Store(users[0], dataManager);
+        }
+
+        [SetUp]
+        public void beforeEachTest()
+        {
+            users = new List<User>();
+            products = new List<Product>();
         }
 
         [Test]
         public void Test_PurchaseThrowsNoErrorForValidFunds()
         {
             //Arrange
-            const string TEST_PRODUCT_ID = "1";
+            addTestUser(99.99);
+            addTestProduct(9.99, 10);
 
-            var users = new List<User>();
-            users.Add(createTestUser("Test User", "", 99.99));
-
-            var products = new List<Product>();
-            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, 10));
-
-            var dataManager = new DataManager(users, products);
-            var store = new Store(users[0], dataManager);
+            var store = buildStore();
 
             //Act
             store.Purchase(TEST_PRODUCT_ID, 10);
@@ -60,16 +71,10 @@ namespace UnitTestProject
         public void Test_PurchaseRemovesProductFromStore()
         {
             //Arrange
-            const string TEST_PRODUCT_ID = "1";
+            addTestUser(99.99);
+            addTestProduct(9.99, 10);
 
-            var users = new List<User>();
-            users.Add(createTestUser("Test User", "", 99.99));
-
-            var products = new List<Product>();
-            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, 10));
-
-            var dataManager = new DataManager(users, products);
-            var store = new Store(users[0], dataManager);
+            var store = buildStore();
 
             //Act
             store.Purchase(TEST_PRODUCT_ID, 9);
@@ -86,16 +91,10 @@ namespace UnitTestProject
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLow()
         {
             //Arrange
-            const string TEST_PRODUCT_ID = "1";
+            addTestUser(1.00);
+            addTestProduct(1.01, 10);
 
-            var users = new List<User>();
-            users.Add(createTestUser("Test User", "", 1.00));
-
-            var products = new List<Product>();
-            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 1.01, 10));
-
-            var dataManager = new DataManager(users, products);
-            var store = new Store(users[0], dataManager);
+            var store = buildStore();
 
             //Act
             store.Purchase(TEST_PRODUCT_ID, 1);
@@ -107,16 +106,10 @@ namespace UnitTestProject
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLowVersion2()
         {
             //Arrange
-            const string TEST_PRODUCT_ID = "1";
+            addTestUser(1.00);
+            addTestProduct(1.01, 10);
 
-            var users = new List<User>();
-            users.Add(createTestUser("Test User", "", 1.00));
-
-            var products = new List<Product>();
-            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 1.01, 10));
-
-            var dataManager = new DataManager(users, products);
-            var store = new Store(users[0], dataManager);
+            var store = buildStore();
 
             //Act/Assert
             try
@@ -135,16 +128,10 @@ namespace UnitTestProject
         public void Test_PurchaseThrowsExceptionWhenSupplyIsTooLow()
         {
             //Arrange
-            const string TEST_PRODUCT_ID = "1";
+            addTestUser(100.00);
+            addTestProduct(1.00, 10);
 
-            var users = new List<User>();
-            users.Add(createTestUser("Test User", "", 100.00));
-
-            var products = new List<Product>();
-            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 1.00, 10));
-
-            var dataManager = new DataManager(users, products);
-            var store = new Store(users[0], dataManager);
+            var store = buildStore();
 
             //Act
             store.Purchase(TEST_PRODUCT_ID, 20);
