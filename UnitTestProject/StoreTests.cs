@@ -70,7 +70,7 @@ namespace UnitTestProject
             products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, 10));
 
             DataManager dataManager = new DataManager(users, products);
-            Store store = new Store(createTestUser("test", "", 100.0), dataManager);
+            Store store = new Store(user, dataManager);
 
             //Act
 
@@ -84,13 +84,23 @@ namespace UnitTestProject
         }
 
         [Test]
+        [ExpectedException(typeof(InsufficientFundsException))]
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLow()
         {
             //Arrange
+            const string TEST_PRODUCT_ID = "1";
 
-            //Act
+            var users = new List<User>();
+            var user = createTestUser("Test User", "", 1.00);
+            users.Add(user);
 
-            //Assert
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 1.01, 10));
+
+            DataManager dataManager = new DataManager(users, products);
+            Store store = new Store(user, dataManager);
+
+            store.Purchase(TEST_PRODUCT_ID, 1);
         }
 
         [Test]
