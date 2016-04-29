@@ -18,22 +18,22 @@ namespace Refactoring
             this.dataManager = dataManager;
         }
 
-        public void Purchase(string productId, int quantity)
+        public void Purchase(string productId, int quantityPurchased)
         {
             Product product = this.GetProductById(productId);
 
-            if (!UserHasFundsForPurchase(product, quantity))
+            if (!UserHasFundsForPurchase(product, quantityPurchased))
             {
                 throw new InsufficientFundsException();
             }
 
-            if (!StoreHasStockForPurchase(product, quantity))
+            if (!StoreHasStockForPurchase(product, quantityPurchased))
             {
                 throw new OutOfStockException();
             }
 
-            product.Quantity = product.Quantity - quantity+1;
-            user.Balance = user.Balance - product.Price * quantity;
+            product.Quantity -= quantityPurchased;
+            user.Balance = user.Balance - product.Price * quantityPurchased;
 
             dataManager.SaveUser(user);
             dataManager.SaveProduct(product);
