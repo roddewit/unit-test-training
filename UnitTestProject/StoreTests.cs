@@ -102,7 +102,8 @@ namespace UnitTestProject
             const int price = 1;
 
             var store = arrangeSingleProductSingleUserTest(
-                TEST_PRODUCT_ID, price:price, 
+                TEST_PRODUCT_ID, 
+                price:price, 
                 fund:(QUANTITY_TO_PURCHASE-1)*price, 
                 availableToPurchase:QUANTITY_TO_PURCHASE );
 
