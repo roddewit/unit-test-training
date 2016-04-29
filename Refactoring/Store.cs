@@ -76,6 +76,14 @@ namespace Refactoring
             return dataManager.Products.FirstOrDefault(p => p.Id.Equals(productId));
         }
 
+        public int GetProductQuantity(string productId)
+            {
+            return dataManager.Products.FirstOrDefault(p => p.Id.Equals(productId)).Quantity;
+            //Product product;
+            //product = GetProductById(productId);
+            //return product.Quantity;
+            }
+
         public bool ContainsProduct(string productId)
         {
             return dataManager.Products.Count(p => p.Id.Equals(productId)) > 0;
