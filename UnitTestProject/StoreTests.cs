@@ -98,6 +98,8 @@ namespace UnitTestProject
             {
                 Assert.IsTrue(true);
             }
+
+            Assert.Fail();
             
         }
 
