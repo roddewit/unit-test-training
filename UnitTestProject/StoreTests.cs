@@ -40,6 +40,13 @@ namespace UnitTestProject
             return testProduct;
         }
 
+        private Store createStore(List<User> users, List<Product> products)
+        {
+            DataManager dataManager = new DataManager(users, products);
+            Store store = new Store(users[0], dataManager);
+            return store;
+        }
+
         [SetUp]
         public void Test_CodeSetup()
         {
@@ -54,9 +61,7 @@ namespace UnitTestProject
         [Test]
         public void Test_PurchaseThrowsNoErrorForValidFunds()
         {
-            dataManager = new DataManager(users, products);
-            store = new Store(users[0], dataManager);
-
+            store = createStore(users, products);
             store.Purchase(TEST_PRODUCT_ID, 10);
             Assert.Pass("No assertion really necessary here");
         }
@@ -64,9 +69,7 @@ namespace UnitTestProject
         [Test]
         public void Test_PurchaseRemovesProductFromStore()
         {
-            dataManager = new DataManager(users, products);
-            store = new Store(users[0], dataManager);
-
+            store = createStore(users, products);
             store.Purchase(TEST_PRODUCT_ID, 9);
             Assert.AreEqual(1, products[0].Quantity);
             //Assert.IsTrue(products[0].Quantity == 1);   Functional and correct, but the first assert is more appropriate
@@ -79,8 +82,7 @@ namespace UnitTestProject
             users[0].Balance = 1.00;
             products[0].Price = 1.01;
 
-            dataManager = new DataManager(users, products);
-            store = new Store(users[0], dataManager); 
+            store = createStore(users, products);
 
             store.Purchase(TEST_PRODUCT_ID, 1);
             Assert.Fail("InsufficientFundsException was not thrown");   // Should not reach this point due to the [ExpectedException] attribute on this test
@@ -92,8 +94,7 @@ namespace UnitTestProject
             users[0].Balance = 1.00;
             products[0].Price = 1.01;
 
-            dataManager = new DataManager(users, products);
-            store = new Store(users[0], dataManager);
+            store = createStore(users, products);
 
             try
             {
@@ -114,8 +115,7 @@ namespace UnitTestProject
             users[0].Balance = 100.00;
             products[0].Price = 5;
 
-            dataManager = new DataManager(users, products);
-            store = new Store(users[0], dataManager);
+            store = createStore(users, products);
 
             store.Purchase(TEST_PRODUCT_ID, 12);
             Assert.Fail("OutOfStockException was not thrown");   // Should not reach this point due to the [ExpectedException] attribute on this test
