@@ -85,18 +85,49 @@ namespace UnitTestProject
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLow()
         {
             //Arrange
+            const string TEST_PRODUCT_ID = "1";
+            InsufficientFundsException expectedException = new InsufficientFundsException();
+
+            var users = new List<User>();
+            users.Add(createTestUser("Test User", "", 1.00));
+
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 1.01, 10));
+
+            var dataManager = new DataManager(users, products);
+            var store = new Store(users[0], dataManager);
 
             //Act
-
-            //Assert
+            try
+            {
+                store.Purchase(TEST_PRODUCT_ID, 1);
+                Assert.Fail();
+            }
+            catch(Exception e)
+            {
+                Assert.AreEqual(expectedException.Message, e.Message);
+            }
+           
         }
 
         [Test]
+        [ExpectedException(typeof(InsufficientFundsException))]
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLowVersion2()
         {
             //Arrange
+            const string TEST_PRODUCT_ID = "1";
+
+            var users = new List<User>();
+            users.Add(createTestUser("Test User", "", 1.00));
+
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 1.01, 10));
+
+            var dataManager = new DataManager(users, products);
+            var store = new Store(users[0], dataManager);
 
             //Act
+            store.Purchase(TEST_PRODUCT_ID, 1);
 
             //Assert
         }
