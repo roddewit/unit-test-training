@@ -34,20 +34,34 @@ namespace UnitTestProject
             return testProduct;
         }
 
+        private const string TEST_PRODUCT_ID = "1";
+        private List<User> users;
+        private List<Product> products;
+        private DataManager dataManager;
+        private Store store;
+
+        [SetUp]
+        public void Initialize_Data()
+        {
+            users = new List<User>();
+            products = new List<Product>();
+        }
+
+        private void CreateStore()
+        {
+            dataManager = new DataManager(users, products);
+            store = new Store(users[0], dataManager);
+        }
+
         [Test]
         public void Test_PurchaseThrowsNoErrorForValidFunds()
         {
             //Arrange
-            const string TEST_PRODUCT_ID = "1";
-
-            var users = new List<User>();
             users.Add(createTestUser("Test User", "", 99.99));
 
-            var products = new List<Product>();
             products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, 10));
 
-            var dataManager = new DataManager(users, products);
-            var store = new Store(users[0], dataManager);
+            CreateStore();
 
             //Act
             store.Purchase(TEST_PRODUCT_ID, 10);
@@ -60,34 +74,74 @@ namespace UnitTestProject
         public void Test_PurchaseRemovesProductFromStore()
         {
             //Arrange
+            users.Add(createTestUser("Test User", "", 99.99));
+
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, 10));
+
+            CreateStore();
 
             //Act
+            store.Purchase(TEST_PRODUCT_ID, 9);
 
             //Assert 
-            //(choose the appropriate statement(s))
-            //Assert.AreEqual(1, products[0].Quantity);
-            //Assert.AreSame(1, products[0].Quantity);
-            //Assert.IsTrue(products[0].Quantity == 1);
+            Assert.AreEqual(1, products[0].Quantity);
         }
 
         [Test]
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLow()
         {
             //Arrange
+            users.Add(createTestUser("Test User", "", 1.00));
+
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 1.01, 10));
+
+            CreateStore();
+
+            InsufficientFundsException expectedException = new InsufficientFundsException();
 
             //Act
-
-            //Assert
+            try
+            {
+                store.Purchase(TEST_PRODUCT_ID, 1);
+                Assert.Fail();
+            }
+            catch(Exception e)
+            {
+                Assert.AreEqual(expectedException.Message, e.Message);
+            }
+           
         }
 
         [Test]
+        [ExpectedException(typeof(InsufficientFundsException))]
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLowVersion2()
         {
             //Arrange
+            users.Add(createTestUser("Test User", "", 1.00));
+
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 1.01, 10));
+
+            CreateStore();
 
             //Act
+            store.Purchase(TEST_PRODUCT_ID, 1);
 
-            //Assert
+        }
+
+        [Test]
+        [ExpectedException(typeof(OutOfStockException))]
+        public void Test_PurchaseThrowsExceptionWhenOutOfStock()
+        {
+            //Arrange
+            users.Add(createTestUser("Test User", "", 10.00));
+
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 1.00, 0));
+
+            CreateStore();
+
+            //Act
+            store.Purchase(TEST_PRODUCT_ID, 1);
+
         }
 
 
