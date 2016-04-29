@@ -113,6 +113,33 @@ namespace UnitTestProject
             //Assert
         }
 
+        [Test]
+        [ExpectedException(typeof(OutOfStockException))]
+        public void Test_PurchaseThrowsOutOfStockException()
+        {
+            //Arrange
+            const string TEST_PRODUCT_ID = "1";
+
+            var users = new List<User>();
+            var user = createTestUser("Test User", "", 99.99);
+            users.Add(user);
+
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, 1));
+
+            DataManager dataManager = new DataManager(users, products);
+            Store store = new Store(user, dataManager);
+
+            //Act
+
+            store.Purchase(TEST_PRODUCT_ID, 2);
+
+            //Assert 
+            //(choose the appropriate statement(s))
+            Assert.AreEqual(1, products[0].Quantity);
+            //Assert.AreSame(1, products[0].Quantity);
+            //Assert.IsTrue(products[0].Quantity == 1);
+        }
 
         // THE BELOW CODE IS REQUIRED TO PREVENT THE TESTS FROM MODIFYING THE USERS/PRODUCTS ON FILE
         //  This is not a good unit testing pattern - the unit test dependency on the file system should
