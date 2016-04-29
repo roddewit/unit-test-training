@@ -82,22 +82,59 @@ namespace UnitTestProject
         }
 
         [Test]
+        [ExpectedException(typeof(InsufficientFundsException))]
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLow()
         {
             //Arrange
+            const string TEST_PRODUCT_ID = "1";
+
+            var users = new List<User>();
+            users.Add(createTestUser("Test User", "", 1.00));
+
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 1.01, 10));
+
+            var dataManager = new DataManager(users, products);
+            var store = new Store(users[0], dataManager);
 
             //Act
+            store.Purchase(TEST_PRODUCT_ID, 1);
 
             //Assert
+            Assert.Pass("No assertion really necessary here");
         }
 
         [Test]
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLowVersion2()
         {
             //Arrange
+            const string TEST_PRODUCT_ID = "1";
 
+            var users = new List<User>();
+            users.Add(createTestUser("Test User", "", 1.00));
+
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 1.01, 10));
+
+            var dataManager = new DataManager(users, products);
+            var store = new Store(users[0], dataManager);
+            
             //Act
-
+            try
+                {
+                store.Purchase(TEST_PRODUCT_ID, 1);
+                Assert.Fail();
+                }
+            catch (Refactoring.InsufficientFundsException e)
+                {
+                //Assert.Throws(e, InsufficientFundsException);
+                //Assert.Throws<InsufficientFundsException>(e);
+                Assert.IsTrue(e is Refactoring.InsufficientFundsException);
+                }
+            catch (SystemException se) 
+                {
+                Assert.Fail("Unexpection exception thrown of type " + se.GetType());
+                }
             //Assert
         }
 
