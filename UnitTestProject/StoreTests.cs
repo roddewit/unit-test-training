@@ -15,21 +15,14 @@ namespace UnitTestProject
     {
         private User createTestUser(string name, string password, double balance)
         {
-            User testUser = new User();
-            testUser.Name = name;
-            testUser.Password = password;
-            testUser.Balance = balance;
+            var testUser = new User {Name = name, Password = password, Balance = balance};
 
             return testUser;
         }
 
         private Product createTestProduct(string id, string name, double price, int quantity)
         {
-            Product testProduct = new Product();
-            testProduct.Id = id;
-            testProduct.Name = name;
-            testProduct.Price = price;
-            testProduct.Quantity = quantity;
+            var testProduct = new Product {Id = id, Name = name, Price = price, Quantity = quantity};
 
             return testProduct;
         }
@@ -60,36 +53,116 @@ namespace UnitTestProject
         public void Test_PurchaseRemovesProductFromStore()
         {
             //Arrange
+            const string TEST_PRODUCT_ID = "2";
 
+            var users = new List<User> {createTestUser("Unit Test", "", 100.00)};
+            var products = new List<Product> {createTestProduct(TEST_PRODUCT_ID, "MyProduct", 5.00, 10)};
+            var dataManager = new DataManager(users, products);
+            var store = new Store(users.ToList().First(), dataManager);
+            
             //Act
+            store.Purchase(TEST_PRODUCT_ID,9);
 
             //Assert 
             //(choose the appropriate statement(s))
-            //Assert.AreEqual(1, products[0].Quantity);
+            Assert.AreEqual(1, products[0].Quantity);
             //Assert.AreSame(1, products[0].Quantity);
-            //Assert.IsTrue(products[0].Quantity == 1);
+            Assert.IsTrue(products[0].Quantity == 1);
         }
 
         [Test]
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLow()
         {
             //Arrange
+            const string TEST_PRODUCT_ID = "2";
+            const string INSUFFICIENT_FUND_EXCEPTION =
+                "Exception of type 'Refactoring.InsufficientFundsException' was thrown.";
 
-            //Act
+            var users = new List<User> { createTestUser("Unit Test", "", 1.00) };
+            var products = new List<Product> { createTestProduct(TEST_PRODUCT_ID, "MyProduct", 5.00, 10) };
+            var dataManager = new DataManager(users, products);
+            var store = new Store(users.ToList().First(), dataManager);
 
-            //Assert
+            try
+            {
+                //Act
+                store.Purchase(TEST_PRODUCT_ID, 9);
+            }
+            catch (Exception e)
+            {
+                Assert.AreEqual(INSUFFICIENT_FUND_EXCEPTION, e.Message);
+            }
+
         }
 
         [Test]
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLowVersion2()
         {
             //Arrange
+            const string TEST_PRODUCT_ID = "2";
+
+            var users = new List<User> { createTestUser("Unit Test", "", 1.00) };
+            var products = new List<Product> { createTestProduct(TEST_PRODUCT_ID, "MyProduct", 5.00, 1) };
+            var dataManager = new DataManager(users, products);
+            var store = new Store(users.ToList().First(), dataManager);
 
             //Act
-
-            //Assert
+            Assert.Throws<InsufficientFundsException>(() => store.Purchase(TEST_PRODUCT_ID, 9));
         }
 
+
+        [Test]
+        public void Test_ShouldThrowOutOfStockException()
+        {
+            //Arrange
+            Store store;
+            var TEST_PRODUCT_ID = InitialSetup(out store);            
+            //Act
+            Assert.Throws<OutOfStockException>(() => store.Purchase(TEST_PRODUCT_ID, 3));
+
+        }
+
+        [Test]
+        public void Test_ShouldReturnProductList()
+        {
+            //Arrange
+            Store store;
+            var TEST_PRODUCT_ID = InitialSetup(out store);            
+            //Act
+            Assert.IsNotNullOrEmpty(store.GetProductList());
+        }
+
+        [Test]
+        public void Test_ShouldReturnNumberOfProducts()
+        {
+            //Arrange
+            Store store;
+            var TEST_PRODUCT_ID = InitialSetup(out store);
+            //Act
+            Assert.IsNotNullOrEmpty(store.NumberOfProducts().ToString());
+        }
+
+        [Test]
+        public void Test_ShouldContainsProduct()
+        {
+            Store store;
+            var TEST_PRODUCT_ID = InitialSetup(out store);
+
+            //Act
+            Assert.IsTrue(store.ContainsProduct(TEST_PRODUCT_ID));
+        }
+
+        private string InitialSetup(out Store store)
+        {
+            //Arrange
+            const string TEST_PRODUCT_ID = "2";
+
+            var users = new List<User> {createTestUser("Unit Test", "", 100.00)};
+            var products = new List<Product> {createTestProduct(TEST_PRODUCT_ID, "MyProduct", 5.00, 1)};
+            var dataManager = new DataManager(users, products);
+            store = new Store(users.ToList().First(), dataManager);
+            return TEST_PRODUCT_ID;
+        }
 
         // THE BELOW CODE IS REQUIRED TO PREVENT THE TESTS FROM MODIFYING THE USERS/PRODUCTS ON FILE
         //  This is not a good unit testing pattern - the unit test dependency on the file system should
