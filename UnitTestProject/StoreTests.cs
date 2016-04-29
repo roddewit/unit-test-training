@@ -60,12 +60,25 @@ namespace UnitTestProject
         public void Test_PurchaseRemovesProductFromStore()
         {
             //Arrange
+            const string TEST_PRODUCT_ID = "1";
+
+            var users = new List<User>();
+            var user = createTestUser("Test User", "", 99.99);
+            users.Add(user);
+
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, 10));
+
+            DataManager dataManager = new DataManager(users, products);
+            Store store = new Store(createTestUser("test", "", 100.0), dataManager);
 
             //Act
 
+            store.Purchase(TEST_PRODUCT_ID, 9);
+
             //Assert 
             //(choose the appropriate statement(s))
-            //Assert.AreEqual(1, products[0].Quantity);
+            Assert.AreEqual(1, products[0].Quantity);
             //Assert.AreSame(1, products[0].Quantity);
             //Assert.IsTrue(products[0].Quantity == 1);
         }
