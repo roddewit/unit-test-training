@@ -84,10 +84,7 @@ namespace UnitTestProject
             store.Purchase(TEST_PRODUCT_ID, 9);
 
             //Assert 
-            //(choose the appropriate statement(s))
             Assert.AreEqual(1, products[0].Quantity);
-            //Assert.AreSame(1, products[0].Quantity);
-            //Assert.IsTrue(products[0].Quantity == 1);
         }
 
         [Test]
