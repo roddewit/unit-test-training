@@ -126,6 +126,28 @@ namespace UnitTestProject
             Assert.LessOrEqual(products[0].Price, users[0].Balance);
         }
 
+        [Test]
+        public void Test_PurchaseThrowsExceptionWhenProductOutOfStock()
+        {
+            //Arrange
+            const string TEST_PRODUCT_ID = "1";
+            const int qt = 2;
+
+            var users = new List<User>();
+            users.Add(createTestUser("Test User", "", 100.00));
+
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 1.00, 1));
+
+            var dataManager = new DataManager(users, products);
+            var store = new Store(users[0], dataManager);
+
+            //Act
+            store.Purchase(TEST_PRODUCT_ID, qt);
+
+            //Assert
+            Assert.GreaterOrEqual(products[0].Quantity,qt);
+        }
 
         // THE BELOW CODE IS REQUIRED TO PREVENT THE TESTS FROM MODIFYING THE USERS/PRODUCTS ON FILE
         //  This is not a good unit testing pattern - the unit test dependency on the file system should
