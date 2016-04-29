@@ -60,36 +60,94 @@ namespace UnitTestProject
         public void Test_PurchaseRemovesProductFromStore()
         {
             //Arrange
+            const string TEST_PRODUCT_ID = "1";
+
+            var users = new List<User>();
+            users.Add(createTestUser("Test User", "", 99.99));
+
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, 10));
+
+            var dataManager = new DataManager(users, products);
+            var store = new Store(users[0], dataManager);
 
             //Act
+            store.Purchase(TEST_PRODUCT_ID, 9);
+
 
             //Assert 
             //(choose the appropriate statement(s))
             //Assert.AreEqual(1, products[0].Quantity);
             //Assert.AreSame(1, products[0].Quantity);
-            //Assert.IsTrue(products[0].Quantity == 1);
+            Assert.IsTrue(products[0].Quantity == 1);
         }
 
         [Test]
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLow()
         {
             //Arrange
+            const string TEST_PRODUCT_ID = "1";
+
+            var users = new List<User>();
+            users.Add(createTestUser("Test User", "", 1.00));
+
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 1.01, 10));
+
+            var dataManager = new DataManager(users, products);
+            var store = new Store(users[0], dataManager);
 
             //Act
+            store.Purchase(TEST_PRODUCT_ID, 1);
 
             //Assert
+            Assert.GreaterOrEqual(users[0].Balance, products[0].Price);
         }
 
         [Test]
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLowVersion2()
         {
             //Arrange
+            const string TEST_PRODUCT_ID = "1";
+
+            var users = new List<User>();
+            users.Add(createTestUser("Test User", "", 1.00));
+
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 1.01, 10));
+
+            var dataManager = new DataManager(users, products);
+            var store = new Store(users[0], dataManager);
 
             //Act
+            store.Purchase(TEST_PRODUCT_ID, 1);
 
             //Assert
+            Assert.LessOrEqual(products[0].Price, users[0].Balance);
         }
 
+        [Test]
+        public void Test_PurchaseThrowsExceptionWhenProductOutOfStock()
+        {
+            //Arrange
+            const string TEST_PRODUCT_ID = "1";
+            const int qt = 2;
+
+            var users = new List<User>();
+            users.Add(createTestUser("Test User", "", 100.00));
+
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 1.00, 1));
+
+            var dataManager = new DataManager(users, products);
+            var store = new Store(users[0], dataManager);
+
+            //Act
+            store.Purchase(TEST_PRODUCT_ID, qt);
+
+            //Assert
+            Assert.GreaterOrEqual(products[0].Quantity,qt);
+        }
 
         // THE BELOW CODE IS REQUIRED TO PREVENT THE TESTS FROM MODIFYING THE USERS/PRODUCTS ON FILE
         //  This is not a good unit testing pattern - the unit test dependency on the file system should
