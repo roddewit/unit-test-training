@@ -13,6 +13,11 @@ namespace UnitTestProject
     [TestFixture]
     class StoreTests
     {
+        private const string TEST_PRODUCT_ID = "1";
+        private const int QUANTITY_OF_PRODUCT = 10;
+        private List<Product> products;
+        private List<User> users;
+
         private User createTestUser(string name, string password, double balance)
         {
             User testUser = new User();
@@ -34,20 +39,22 @@ namespace UnitTestProject
             return testProduct;
         }
 
+        private Store setupStore(int numberOfProducts, double priceOfProduct, double userBalance)
+        {
+            users = new List<User>();
+            users.Add(createTestUser("Test User", "", userBalance));
+            products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", priceOfProduct, numberOfProducts));
+
+            var dataManager = new DataManager(users, products);
+            return new Store(users[0], dataManager);
+        }
+
         [Test]
         public void Test_PurchaseThrowsNoErrorForValidFunds()
         {
             //Arrange
-            const string TEST_PRODUCT_ID = "1";
-
-            var users = new List<User>();
-            users.Add(createTestUser("Test User", "", 99.99));
-
-            var products = new List<Product>();
-            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, 10));
-
-            var dataManager = new DataManager(users, products);
-            var store = new Store(users[0], dataManager);
+            var store = setupStore(QUANTITY_OF_PRODUCT, 9.99, 99.99);
 
             //Act
             store.Purchase(TEST_PRODUCT_ID, 10);
@@ -60,34 +67,102 @@ namespace UnitTestProject
         public void Test_PurchaseRemovesProductFromStore()
         {
             //Arrange
+            var store = setupStore(QUANTITY_OF_PRODUCT, 9.99, 99.99);
 
             //Act
-
+            store.Purchase(TEST_PRODUCT_ID, 9);
             //Assert 
             //(choose the appropriate statement(s))
-            //Assert.AreEqual(1, products[0].Quantity);
+            Assert.AreEqual(1, products[0].Quantity);
             //Assert.AreSame(1, products[0].Quantity);
             //Assert.IsTrue(products[0].Quantity == 1);
         }
 
         [Test]
+        [ExpectedException(typeof(InsufficientFundsException))]
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLow()
         {
             //Arrange
+            var store = setupStore(QUANTITY_OF_PRODUCT, 1.01, 1.00);
 
             //Act
-
-            //Assert
+            store.Purchase(TEST_PRODUCT_ID, 1);
         }
 
         [Test]
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLowVersion2()
         {
             //Arrange
+            var store = setupStore(QUANTITY_OF_PRODUCT, 1.01, 1.00);
+            //Act
+            bool exception = false;
+            //Assert
+            try
+            {
+                store.Purchase(TEST_PRODUCT_ID, 1);
+                Assert.Fail();
+            }
+            catch (InsufficientFundsException)
+            {
+                exception = true;
+            }
+            catch (Exception)
+            {
+                Assert.Fail();
+            }
+            Assert.IsTrue(exception);
+        }
+
+        [Test]
+        [ExpectedException(typeof(OutOfStockException))]
+        public void Test_PurchaseThrowsExceptionWhenYouTryToPurcahseToMuch()
+        {
+            //Arrange
+            var store = setupStore(1, 1.00, 5.00);
 
             //Act
+            store.Purchase(TEST_PRODUCT_ID, 2);
+        }
+
+        [Test]
+        public void Test_GetProductListSucceed()
+        {
+            //Arrange
+            var store = setupStore(QUANTITY_OF_PRODUCT, 9.99, 99.99);
+            string expectedProductList = "\nWhat would you like to buy?\n1: Product ($9.99)\nType quit to exit the application\n";
+
+            //Act
+            string actualProductList = store.GetProductList();
 
             //Assert
+            Assert.AreEqual(expectedProductList, actualProductList);
+        }
+
+
+        [Test]
+        public void Test_NumberOfProductsSucceed()
+        {
+            //Arrange
+            var store = setupStore(QUANTITY_OF_PRODUCT, 9.99, 99.99);
+            int expectedNumberOfProducts = 1;
+            //Act
+            int actualNumberOfProducts = store.NumberOfProducts();
+
+            //Assert
+            Assert.AreEqual(expectedNumberOfProducts, actualNumberOfProducts);
+        }
+
+
+        [Test]
+        public void Test_ContainsProduct_ReturnWithExactMatch()
+        {
+            //Arrange
+            var store = setupStore(QUANTITY_OF_PRODUCT, 9.99, 99.99);
+            //Act
+            bool expectedProduct = store.ContainsProduct(TEST_PRODUCT_ID);
+
+            //Assert
+            Assert.IsTrue(expectedProduct);
         }
 
 
