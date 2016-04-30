@@ -13,7 +13,10 @@ namespace UnitTestProject
     [TestFixture]
     class StoreTests
     {
-        private const string TEST_PRODUCT_ID = "1"; 
+        private const string TEST_PRODUCT_ID = "1";
+        private const int NUMBER_OF_PRODUCTS = 10;
+        private List<Product> products = new List<Product>();
+        private List<User> users = new List<User>();
 
         private User createTestUser(string name, string password, double balance)
         {
@@ -36,20 +39,20 @@ namespace UnitTestProject
             return testProduct;
         }
 
+        private Store setupStore(int numberOfProducts, double priceOfProduct, double userBalance)
+        {
+            users.Add(createTestUser("Test User", "", userBalance));
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", priceOfProduct, numberOfProducts));
+
+            var dataManager = new DataManager(users, products);
+            return new Store(users[0], dataManager);
+        }
+
         [Test]
         public void Test_PurchaseThrowsNoErrorForValidFunds()
         {
             //Arrange
-            
-
-            var users = new List<User>();
-            users.Add(createTestUser("Test User", "", 99.99));
-
-            var products = new List<Product>();
-            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, 10));
-
-            var dataManager = new DataManager(users, products);
-            var store = new Store(users[0], dataManager);
+            var store = setupStore(NUMBER_OF_PRODUCTS, 9.99, 99.99);
 
             //Act
             store.Purchase(TEST_PRODUCT_ID, 10);
@@ -62,16 +65,7 @@ namespace UnitTestProject
         public void Test_PurchaseRemovesProductFromStore()
         {
             //Arrange
-            const int NUMBER_OF_PRODUCTS = 10;
-
-            var users = new List<User>();
-            users.Add(createTestUser("Test User", "", 99.99));
-
-            var products = new List<Product>();
-            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, NUMBER_OF_PRODUCTS));
-
-            var dataManager = new DataManager(users, products);
-            var store = new Store(users[0], dataManager);
+            var store = setupStore(NUMBER_OF_PRODUCTS, 9.99, 99.99);
 
             //Act
             store.Purchase(TEST_PRODUCT_ID, 9);
@@ -83,23 +77,38 @@ namespace UnitTestProject
         }
 
         [Test]
+        [ExpectedException(typeof(InsufficientFundsException))]
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLow()
         {
             //Arrange
+            var store = setupStore(NUMBER_OF_PRODUCTS, 1.01, 1.00);
 
             //Act
-
-            //Assert
+            store.Purchase(TEST_PRODUCT_ID, 1);
         }
 
         [Test]
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLowVersion2()
         {
             //Arrange
-
+            var store = setupStore(NUMBER_OF_PRODUCTS, 1.01, 1.00);
             //Act
-
+            bool exception = false;
             //Assert
+            try
+            {
+                store.Purchase(TEST_PRODUCT_ID, 1);
+                Assert.Fail();
+            }
+            catch (InsufficientFundsException)
+            {
+                exception = true;
+            }
+            catch (Exception)
+            {
+                Assert.Fail();
+            }
+            Assert.IsTrue(exception);
         }
 
 
