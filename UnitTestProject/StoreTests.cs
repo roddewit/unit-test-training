@@ -14,9 +14,9 @@ namespace UnitTestProject
     class StoreTests
     {
         private const string TEST_PRODUCT_ID = "1";
-        private const int NUMBER_OF_PRODUCTS = 10;
-        private List<Product> products = new List<Product>();
-        private List<User> users = new List<User>();
+        private const int QUANTITY_OF_PRODUCT = 10;
+        private List<Product> products;
+        private List<User> users;
 
         private User createTestUser(string name, string password, double balance)
         {
@@ -41,7 +41,9 @@ namespace UnitTestProject
 
         private Store setupStore(int numberOfProducts, double priceOfProduct, double userBalance)
         {
+            users = new List<User>();
             users.Add(createTestUser("Test User", "", userBalance));
+            products = new List<Product>();
             products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", priceOfProduct, numberOfProducts));
 
             var dataManager = new DataManager(users, products);
@@ -52,7 +54,7 @@ namespace UnitTestProject
         public void Test_PurchaseThrowsNoErrorForValidFunds()
         {
             //Arrange
-            var store = setupStore(NUMBER_OF_PRODUCTS, 9.99, 99.99);
+            var store = setupStore(QUANTITY_OF_PRODUCT, 9.99, 99.99);
 
             //Act
             store.Purchase(TEST_PRODUCT_ID, 10);
@@ -65,7 +67,7 @@ namespace UnitTestProject
         public void Test_PurchaseRemovesProductFromStore()
         {
             //Arrange
-            var store = setupStore(NUMBER_OF_PRODUCTS, 9.99, 99.99);
+            var store = setupStore(QUANTITY_OF_PRODUCT, 9.99, 99.99);
 
             //Act
             store.Purchase(TEST_PRODUCT_ID, 9);
@@ -81,7 +83,7 @@ namespace UnitTestProject
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLow()
         {
             //Arrange
-            var store = setupStore(NUMBER_OF_PRODUCTS, 1.01, 1.00);
+            var store = setupStore(QUANTITY_OF_PRODUCT, 1.01, 1.00);
 
             //Act
             store.Purchase(TEST_PRODUCT_ID, 1);
@@ -91,7 +93,7 @@ namespace UnitTestProject
         public void Test_PurchaseThrowsExceptionWhenBalanceIsTooLowVersion2()
         {
             //Arrange
-            var store = setupStore(NUMBER_OF_PRODUCTS, 1.01, 1.00);
+            var store = setupStore(QUANTITY_OF_PRODUCT, 1.01, 1.00);
             //Act
             bool exception = false;
             //Assert
@@ -109,6 +111,72 @@ namespace UnitTestProject
                 Assert.Fail();
             }
             Assert.IsTrue(exception);
+        }
+
+        [Test]
+        [ExpectedException(typeof(OutOfStockException))]
+        public void Test_PurchaseThrowsExceptionWhenYouTryToPurcahseToMuch()
+        {
+            //Arrange
+            var store = setupStore(1, 1.00, 5.00);
+
+            //Act
+            store.Purchase(TEST_PRODUCT_ID, 2);
+        }
+
+        [Test]
+        public void Test_GetProductList()
+        {
+            //Arrange
+            var store = setupStore(QUANTITY_OF_PRODUCT, 9.99, 99.99);
+            string expectedProductList = "\nWhat would you like to buy?\n1: Product ($9.99)\nType quit to exit the application\n";
+
+            //Act
+            string actualProductList = store.GetProductList();
+
+            //Assert
+            Assert.AreEqual(expectedProductList, actualProductList);
+        }
+
+
+        [Test]
+        public void Test_NumberOfProducts()
+        {
+            //Arrange
+            var store = setupStore(QUANTITY_OF_PRODUCT, 9.99, 99.99);
+            int expectedNumberOfProducts = 1;
+            //Act
+            int actualNumberOfProducts = store.NumberOfProducts();
+
+            //Assert
+            Assert.AreEqual(expectedNumberOfProducts, actualNumberOfProducts);
+        }
+
+
+        [Test]
+        public void Test_GetNumberOfProducts()
+        {
+            //Arrange
+            var store = setupStore(QUANTITY_OF_PRODUCT, 9.99, 99.99);
+            int expectedNumberOfProducts = 1;
+            //Act
+            int actualNumberOfProducts = store.NumberOfProducts();
+
+            //Assert
+            Assert.AreEqual(expectedNumberOfProducts, actualNumberOfProducts);
+        }
+
+
+        [Test]
+        public void Test_ContainsProduct_ReturnWithExactMatch()
+        {
+            //Arrange
+            var store = setupStore(QUANTITY_OF_PRODUCT, 9.99, 99.99);
+            //Act
+            bool expectedProduct = store.ContainsProduct(TEST_PRODUCT_ID);
+
+            //Assert
+            Assert.IsTrue(expectedProduct);
         }
 
 
