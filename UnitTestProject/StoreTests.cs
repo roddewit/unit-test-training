@@ -125,7 +125,7 @@ namespace UnitTestProject
         }
 
         [Test]
-        public void Test_GetProductList()
+        public void Test_GetProductListSucceed()
         {
             //Arrange
             var store = setupStore(QUANTITY_OF_PRODUCT, 9.99, 99.99);
@@ -140,21 +140,7 @@ namespace UnitTestProject
 
 
         [Test]
-        public void Test_NumberOfProducts()
-        {
-            //Arrange
-            var store = setupStore(QUANTITY_OF_PRODUCT, 9.99, 99.99);
-            int expectedNumberOfProducts = 1;
-            //Act
-            int actualNumberOfProducts = store.NumberOfProducts();
-
-            //Assert
-            Assert.AreEqual(expectedNumberOfProducts, actualNumberOfProducts);
-        }
-
-
-        [Test]
-        public void Test_GetNumberOfProducts()
+        public void Test_NumberOfProductsSucceed()
         {
             //Arrange
             var store = setupStore(QUANTITY_OF_PRODUCT, 9.99, 99.99);
