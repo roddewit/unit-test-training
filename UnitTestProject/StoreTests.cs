@@ -13,6 +13,8 @@ namespace UnitTestProject
     [TestFixture]
     class StoreTests
     {
+        private const string TEST_PRODUCT_ID = "1"; 
+
         private User createTestUser(string name, string password, double balance)
         {
             User testUser = new User();
@@ -38,7 +40,7 @@ namespace UnitTestProject
         public void Test_PurchaseThrowsNoErrorForValidFunds()
         {
             //Arrange
-            const string TEST_PRODUCT_ID = "1";
+            
 
             var users = new List<User>();
             users.Add(createTestUser("Test User", "", 99.99));
@@ -60,12 +62,22 @@ namespace UnitTestProject
         public void Test_PurchaseRemovesProductFromStore()
         {
             //Arrange
+            const int NUMBER_OF_PRODUCTS = 10;
+
+            var users = new List<User>();
+            users.Add(createTestUser("Test User", "", 99.99));
+
+            var products = new List<Product>();
+            products.Add(createTestProduct(TEST_PRODUCT_ID, "Product", 9.99, NUMBER_OF_PRODUCTS));
+
+            var dataManager = new DataManager(users, products);
+            var store = new Store(users[0], dataManager);
 
             //Act
-
+            store.Purchase(TEST_PRODUCT_ID, 9);
             //Assert 
             //(choose the appropriate statement(s))
-            //Assert.AreEqual(1, products[0].Quantity);
+            Assert.AreEqual(1, products[0].Quantity);
             //Assert.AreSame(1, products[0].Quantity);
             //Assert.IsTrue(products[0].Quantity == 1);
         }
