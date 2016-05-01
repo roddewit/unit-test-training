@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Authenticator.cs" />
+    <Compile Include="NullUserListException.cs" />
     <Compile Include="DataManager.cs" />
     <Compile Include="EmptyUsernameException.cs" />
     <Compile Include="InsufficientFundsException.cs" />

@@ -12,6 +12,10 @@ namespace Refactoring
 
         public Authenticator(List<User> users)
         {
+            if(users == null)
+            {
+                throw new NullUserListException();
+            }
             this.users = users;
         }
 
