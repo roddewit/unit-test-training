@@ -85,6 +85,20 @@ namespace UnitTestProject
             Assert.IsNull( authenticated );
         }
 
+        [Test]
+        public void Test_IncorrectUserNameCanNotLogin ()
+        {
+            string password = "TEST";
+            string name = "TESTNAME";
+            User user = new User();
+            user.Password = password;
+            user.Name = name;
+            users.Add( user );
+            User authenticated = authenticator.Authenticate( "NotAName", password );
+
+            Assert.IsNull( authenticated );
+        }
+
 
     }
 }
