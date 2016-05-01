@@ -12,6 +12,10 @@ namespace Refactoring
 
         public Authenticator(List<User> users)
         {
+            if(users == null)
+            {
+                throw new NullUserListException();
+            }
             this.users = users;
         }
 
@@ -24,7 +28,7 @@ namespace Refactoring
         {
             if (IsValidUsername(username)) 
             {
-                return users.FirstOrDefault(user => user.Name.Equals(username) && (password == null || user.Password.Equals(password)));
+                return users.FirstOrDefault(user => user.Name.Equals(username) && user.Password.Equals(password));
             }
             else
             {
