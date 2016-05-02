@@ -16,5 +16,12 @@ namespace Refactoring
         public string Password;
         [JsonProperty("Balance")]
         public double Balance;
+
+        public User(string Name, string Password, double Balance)
+        {
+            this.Name = Name;
+            this.Password = Password;
+            this.Balance = Balance;
+        }
     }
 }

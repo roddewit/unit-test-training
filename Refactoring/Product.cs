@@ -18,5 +18,13 @@ namespace Refactoring
         public double Price;
         [JsonProperty("Quantity")]
         public int Quantity;
+
+        public Product(string Id, string Name, double Price, int Quantity)
+        {
+            this.Id = Id;
+            this.Name = Name;
+            this.Price = Price;
+            this.Quantity = Quantity;
+        }
     }
 }
