@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using Refactoring;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace UnitTestProject
 {
-    [TestClass]
+    [TestFixture]
     public class AuthenticatorTests
     {
         #region Variables
@@ -38,7 +39,7 @@ namespace UnitTestProject
         #endregion TestSetUp
 
         #region TestMethod
-        [TestMethod] 
+        [Test] 
         public void Test_NullUserName()
         {
             //Assign
@@ -53,7 +54,7 @@ namespace UnitTestProject
 
         }
 
-        [TestMethod] 
+        [Test] 
         public void Test_ContainUserByUserName()
         {
             //Assign
