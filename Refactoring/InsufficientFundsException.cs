@@ -9,5 +9,6 @@ namespace Refactoring
     [Serializable]
     public class InsufficientFundsException : Exception
     {
+        public static object i { get; set; }
     }
 }
